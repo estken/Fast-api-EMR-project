@@ -23,3 +23,19 @@ class UpdateStatusSchema(BaseModel):
             
 class UpdateClientKeySchema(BaseModel):
     client_key: str
+    
+class UserGroupSchema(BaseModel):
+    group_name: str
+    slug: str
+    
+class UpdateUserGroupSchema(BaseModel):
+    group_name: str = None
+    slug: str = None
+    status: bool = None
+    
+    @validator('status')
+    def validate_status(cls, v):
+        if v not in (True, False):
+            raise ValueError("Value must be True or False")
+        return v
+    

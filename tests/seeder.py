@@ -37,3 +37,17 @@ def seed_client_prod(db: Session):
         client_instances = [Client(**client) for client in client_data]
         db.add_all(client_instances)
         db.commit()
+
+def seed_user_group(db: Session):
+    from db.models import UserGroup
+    user_group_data = [
+        {'client_id': 1, 'slug': 'slug', 'group_name': 'admin'},
+        {'client_id': 1, 'slug': 'slug2', 'group_name': 'doctor'},
+        {'client_id': 2, 'slug': 'slug3', 'group_name': 'pharmacy'},
+        {'client_id': 2, 'slug': 'slug4', 'group_name': 'nurse'}
+    ]
+    
+    if UserGroup.user_group_object(db).count() == 0:
+        group_instance = [UserGroup(**user_group) for user_group in user_group_data]
+        db.add_all(group_instance)
+        db.commit()

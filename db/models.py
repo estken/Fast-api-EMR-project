@@ -20,12 +20,13 @@ class Client(Base):
     updated_at = Column(TIMESTAMP(timezone=True),
                         default=datetime.utcnow(), 
                         onupdate=datetime.utcnow(), nullable=False)
-    
+    # relationship
+    users = relationship("UserGroup", back_populates="clients")
     # get the client object
     @staticmethod
     def get_client_object(db: Session):
         return db.query(Client)
-                               
+                              
     # get the client by ID
     @staticmethod
     def get_client_by_id(db: Session, id: int):
@@ -52,3 +53,49 @@ class Client(Base):
         for key, value in client_data.items():
             setattr(client, key, value)
         return client
+    
+class UserGroup(Base):
+    __tablename__ = 'user_group'
+    id = Column(Integer, primary_key=True, index=True)
+    group_name = Column(String(100), nullable=False)
+    slug = Column(String(100), nullable=False)
+    status = Column(Boolean, nullable=False, default=True)
+    client_id = Column(Integer, ForeignKey('client.id', ondelete='CASCADE'))
+    
+    created_at = Column(TIMESTAMP(timezone=True),
+                        default = datetime.utcnow(), nullable=False)
+    updated_at = Column(TIMESTAMP(timezone=True),
+                        default=datetime.utcnow(), 
+                        onupdate=datetime.utcnow(), nullable=False)
+    
+    # relationship.
+    clients = relationship("Client", back_populates="users")
+    # static methods.
+    @staticmethod
+    def user_group_object(db: Session):
+        return db.query(UserGroup)
+    
+    # get the client by ID
+    @staticmethod
+    def get_user_group_by_id(db: Session, id: int):
+        return UserGroup.user_group_object(db).get(id)
+    
+    @staticmethod
+    def create_user_group(user_group: dict):
+        return UserGroup(**user_group)
+    
+    @staticmethod
+    def get_user_groups(db: Session):
+        return UserGroup.user_group_object(db).distinct(UserGroup.group_name, UserGroup.slug)
+    
+    @staticmethod
+    def get_client_user_groups(db: Session, client_id: int):
+        return UserGroup.user_group_object(db).filter_by(client_id=client_id)
+    
+    @staticmethod
+    def update_user_group(db: Session, user_group_id: int, user_group_data: dict):
+        user_group = UserGroup.get_user_group_by_id(db, user_group_id)
+        for key, value in user_group_data.items():
+            setattr(user_group, key, value)
+        return user_group
+           
