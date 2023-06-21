@@ -42,9 +42,23 @@ def seed_user_group(db: Session):
     from db.models import UserGroup
     user_group_data = [
         {'client_id': 1, 'slug': 'slug', 'group_name': 'admin'},
-        {'client_id': 1, 'slug': 'slug2', 'group_name': 'doctor'},
+        {'client_id': 1, 'slug': 'slug2', 'group_name': 'doctor', 'status': False},
         {'client_id': 2, 'slug': 'slug3', 'group_name': 'pharmacy'},
-        {'client_id': 2, 'slug': 'slug4', 'group_name': 'nurse'}
+        {'client_id': 2, 'slug': 'slug4', 'group_name': 'nurse'},
+        {'client_id': 1, 'slug': 'slug5', 'group_name': 'admin1'},
+        {'client_id': 1, 'slug': 'slug6', 'group_name': 'doctor1', 'status': False},
+        {'client_id': 2, 'slug': 'slug7', 'group_name': 'pharmacy1'},
+        {'client_id': 2, 'slug': 'slug8', 'group_name': 'nurse1'},
+        {'client_id': 1, 'slug': 'slug9', 'group_name': 'admin2'},
+        {'client_id': 1, 'slug': 'slug10', 'group_name': 'doctor2', 'status': False},
+        {'client_id': 2, 'slug': 'slug11', 'group_name': 'pharmacy2'},
+        {'client_id': 2, 'slug': 'slug12', 'group_name': 'nurse3'},
+        {'client_id': 2, 'slug': 'slug13', 'group_name': 'pharmacy3'},
+        {'client_id': 2, 'slug': 'slug14', 'group_name': 'nurse4'}, 
+        {'client_id': 2, 'slug': 'slug15', 'group_name': 'pharmacy4'},
+        {'client_id': 2, 'slug': 'slug16', 'group_name': 'nurse5'},
+        {'client_id': 2, 'slug': 'slug17', 'group_name': 'pharmacy5'},
+        {'client_id': 2, 'slug': 'slug18', 'group_name': 'nurse6'}
     ]
     
     if UserGroup.user_group_object(db).count() == 0:

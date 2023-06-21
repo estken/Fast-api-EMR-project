@@ -66,7 +66,7 @@ def test_get_all_groups(get_session):
     seed_user_group(get_session)
     # get all groups added.
     retrieve_groups = UserGroup.get_user_groups(get_session)
-    assert len(retrieve_groups.all()) == 4
+    assert len(retrieve_groups.all()) == 18
     
 def test_get_all_groups_per_client(get_session):
      # seed the client and user_group
@@ -74,7 +74,7 @@ def test_get_all_groups_per_client(get_session):
     seed_user_group(get_session)
     # get all groups added.
     retrieve_groups = UserGroup.get_client_user_groups(get_session, 1)
-    assert len(retrieve_groups.all()) == 2
+    assert len(retrieve_groups.all()) == 6
     
     
     

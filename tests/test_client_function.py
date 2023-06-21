@@ -43,7 +43,6 @@ def test_create_client(client_instance, get_session):
     #check the length of the table to be sure it has increased.
     retrieve_clients = models.Client.retrieve_all_client(get_session)
     assert len(retrieve_clients) == 1
-    
     # check if the vaues of attributes created.
     get_details = models.Client.check_single_key(get_session, client_data['client_key'])
     assert get_details.slug == client_data['slug']
