@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session as session_local
 from db import models
 from db.session import get_db
 from apis.client import client_router
+from apis.user_group import user_group_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn, asyncio
 import os, uuid, multiprocessing
@@ -61,6 +62,10 @@ async def main() -> None:
 # include client router.
 access_control_app.include_router(
     client_router
+)
+# include the user router.
+access_control_app.include_router(
+    user_group_router
 )
 
 @access_control_app.on_event("startup")

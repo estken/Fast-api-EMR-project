@@ -75,11 +75,10 @@ class UserGroup(Base):
     def user_group_object(db: Session):
         return db.query(UserGroup)
     
-    # get the client by ID
+    # get the user group by ID
     @staticmethod
     def get_user_group_by_id(db: Session, id: int):
         return UserGroup.user_group_object(db).get(id)
-    
     @staticmethod
     def create_user_group(user_group: dict):
         return UserGroup(**user_group)
