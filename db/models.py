@@ -87,6 +87,12 @@ class ClientUsers(Base):
         return ClientUsers.client_user_object(db)
     
     @staticmethod
+    def check_client_email(db, client_id, email_address):
+        return ClientUsers.client_user_object(db).filter_by(
+            client_id = client_id, email_address= email_address
+        ).first()
+    
+    @staticmethod
     def retrieve_user_by_id(db, user_id):
         return ClientUsers.client_user_object(db).get(user_id)
     
