@@ -39,10 +39,20 @@ class UpdateClientUserSchema(BaseModel):
     email_address: EmailStr = None
     password: str = Field(None, min_length=8)
     group_slug: str = None
-    admin: bool = False
-    
+    admin: bool = None
+    status: bool = None
+       
     @validator('admin')
     def validate_admin(cls, v):
         if v not in (True, False):
             raise ValueError("Value must be True or False")
+        return v
+    
+    @validator('status')
+    def validate_status(cls, v):
+        if v not in (True, False):
+            raise ValueError("Value must be True or False")
         return v 
+    
+class refreshTokenSchema(BaseModel):
+    refresh_token: str

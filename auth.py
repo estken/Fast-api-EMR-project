@@ -3,7 +3,17 @@ from fastapi import Depends, HTTPException, Request
 from db.session import get_db
 from sqlalchemy.orm import Session
 from db import models
+from jose import jwt
 from response_handler import error_response
+from fastapi.security import OAuth2PasswordBearer
+
+import os
+
+ACCESS_SECRET_KEY = os.getenv('ACCESS_SECRET_KEY')
+REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')
+
+# Create an instance of the OAuth, redirects the user back here.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl = 'user/login')
 
 
 async def validate_client_key(request: Request, db: Session=Depends(get_db)):
@@ -23,3 +33,31 @@ async def validate_client_key(request: Request, db: Session=Depends(get_db)):
     request.state.data = get_client.id
     
     return request
+
+async def validate_active_client(db: Session = Depends(get_db), token:str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, ACCESS_SECRET_KEY, algorithms=["HS256"])
+        # get email, client_id.
+        email = payload.get("sub")
+        client_id = payload.get("client_id")
+        # check if the client mail exist for that user.
+        get_user = models.ClientUsers.check_client_email(db, client_id, email)
+        if get_user is None:
+            return error_response.unauthorized_error(detail="You don't have permission to this page")
+        # check if the user's account is inactive
+        if not get_user.status:
+            return error_response.unauthorized_error(detail="Your account is inactive")
+        # check if the client account is inactive.
+        if not get_user.client.status:
+            return error_response.unauthorized(detail="Client is inactive")
+    # jwt token error
+    except jwt.ExpiredSignatureError:
+        return error_response.unauthorized_error(detail='Token has expired.')
+        
+    except jwt.JWTError:
+        return error_response.unauthorized_error(detail="Invalid Token")
+    
+    except Exception as e:
+        return error_response.unauthorized_error(detail=str(e))
+    
+    return get_user

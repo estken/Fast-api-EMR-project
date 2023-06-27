@@ -60,6 +60,7 @@ class ClientUsers(Base):
     email_address = Column(String(100), nullable=False, index=True)
     password = Column(String(255), nullable=False)
     admin = Column(Boolean, default=False)
+    status = Column(Boolean, default=True)
     
     created_at = Column(TIMESTAMP(timezone=True),
                         default = datetime.utcnow(), nullable=False)

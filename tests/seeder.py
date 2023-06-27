@@ -57,3 +57,20 @@ def seed_client_users(db: Session):
               
         db.add_all(user_instance)
         db.commit()
+        
+def seed_client_user_prod(db: Session):
+    from db.models import ClientUsers
+    client_user_data = [
+        {'client_id':1, 'email_address': 'admin@intuitive.com', 'password': 'Qwerty123@', 'admin': True}
+    ]
+    
+    if ClientUsers.client_user_object(db).count() == 0:
+        user_instance = []
+        hash_pw = PasswordHasher()
+        for user in client_user_data:
+            hashed = hash_pw.hash(user['password'])
+            user['password'] = hashed
+            user_instance.append(ClientUsers(**user))
+              
+        db.add_all(user_instance)
+        db.commit()
