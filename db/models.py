@@ -20,6 +20,8 @@ class Client(Base):
     updated_at = Column(TIMESTAMP(timezone=True),
                         default=datetime.utcnow(), 
                         onupdate=datetime.utcnow(), nullable=False)
+    # relationship.
+    client_centers = relationship('ClientCenter', back_populates='client')
     
     # get the client object
     @staticmethod
@@ -52,3 +54,36 @@ class Client(Base):
         for key, value in client_data.items():
             setattr(client, key, value)
         return client
+    
+class ClientCenter(Base):
+    __tablename__="client_center"
+    id = Column(Integer, primary_key=True, index= True)
+    client_id = Column(Integer, ForeignKey("client.id"), nullable=False)
+    center = Column(String(100), nullable = False)
+    status = Column(Boolean, default= True)
+    created_at = Column(TIMESTAMP(timezone=True),
+                        default = datetime.utcnow(), nullable=False)
+    updated_at = Column(TIMESTAMP(timezone=True),
+                        default=datetime.utcnow(), 
+                        onupdate=datetime.utcnow(), nullable=False)
+    # relationship part.
+    client = relationship('Client', back_populates="client_centers")
+    
+    @staticmethod
+    def get_center_object(db: Session):
+        return db.query(ClientCenter)
+    
+    @staticmethod
+    def get_center_by_id(db: Session, center_id: int):
+        return ClientCenter.get_center_object(db).get(center_id)
+    
+    @staticmethod
+    def get_all_client_center(db: Session, client_id: int):
+        return ClientCenter.get_center_object(db).filter(client_id = client_id).all()
+    
+    @staticmethod
+    def update_center(db:Session, center_id: int, update_data):
+        client_center = ClientCenter.get_center_by_id(db, center_id)
+        for key, value in update_data.items():
+            setattr(client_center, key, value)
+        return client_center
