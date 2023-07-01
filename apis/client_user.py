@@ -6,7 +6,8 @@ from db.session import get_db
 from schema import (
     ClientUserSchema, 
     UpdateClientUserSchema,
-    refreshTokenSchema
+    refreshTokenSchema,
+    UpdateClientUserSchema
 )
 from crud import user_crud
 from db import models
@@ -51,3 +52,14 @@ async def user_login(request: Request, login_data: OAuth2PasswordRequestForm = D
 @user_router.post("/refresh_token", summary="Refresh Expired token of logged in users.", status_code=200)
 async def refresh_token(refresh_token: refreshTokenSchema, db: Session = Depends(get_db)):
     return user_crud.refresh_token(db, refresh_token.refresh_token)
+
+@user_router.get('/view', summary="View Single User Information", status_code=200)
+async def view_detail(current_user: models.ClientUsers = Depends(validate_active_client), db: Session = Depends(get_db)):
+    return user_crud.get_details(db, current_user)
+
+@user_router.patch('/update/{username}', summary="Update the User Information", status_code=200)
+async def update_user(username: str, update_data: UpdateClientUserSchema, current_user: models.ClientUsers = Depends(validate_active_client), 
+                      db: Session = Depends(get_db)):
+    return user_crud.update_details(db, username, current_user, update_data)
+    
+    

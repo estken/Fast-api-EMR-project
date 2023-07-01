@@ -25,7 +25,7 @@ class UpdateClientKeySchema(BaseModel):
     client_key: str
     
 class ClientUserSchema(BaseModel):
-    email_address: EmailStr
+    username: str
     password: str = Field(min_length=8)
     admin: bool = False
     
@@ -36,8 +36,7 @@ class ClientUserSchema(BaseModel):
         return v
 
 class UpdateClientUserSchema(BaseModel):
-    email_address: EmailStr = None
-    password: str = Field(None, min_length=8)
+    username: str = None
     group_slug: str = None
     admin: bool = None
     status: bool = None
@@ -56,3 +55,6 @@ class UpdateClientUserSchema(BaseModel):
     
 class refreshTokenSchema(BaseModel):
     refresh_token: str
+    
+class UpdateClientPasswordSchema(BaseModel):
+    password: str

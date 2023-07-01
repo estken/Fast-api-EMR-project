@@ -57,7 +57,7 @@ class ClientUsers(Base):
     __tablename__ = 'client_users'
     id = Column(Integer, primary_key=True, index=True)
     client_id = Column(Integer, ForeignKey('client.id', ondelete="CASCADE"), nullable=False)
-    email_address = Column(String(100), nullable=False, index=True)
+    username = Column(String(100), nullable=False, index=True)
     password = Column(String(255), nullable=False)
     admin = Column(Boolean, default=False)
     status = Column(Boolean, default=True)
@@ -88,10 +88,10 @@ class ClientUsers(Base):
         return ClientUsers.client_user_object(db)
     
     @staticmethod
-    def check_client_email(db, client_id, email_address):
+    def check_client_username(db, client_id, username):
         return ClientUsers.client_user_object(db).filter_by(
-            client_id = client_id, email_address= email_address
-        ).first()
+            client_id = client_id, username=username
+            ).first()
     
     @staticmethod
     def retrieve_user_by_id(db, user_id):

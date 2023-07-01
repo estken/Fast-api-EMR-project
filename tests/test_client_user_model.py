@@ -11,7 +11,7 @@ def test_create_user(get_session):
     seed_client(get_session)
     # create the data.
     user_data = {
-        "email_address": "abc@gmail.com",
+        "username": "abc@gmail.com",
         "password": "admin@123",
     }
     # first check if the model is empty.
@@ -30,10 +30,10 @@ def test_create_user(get_session):
     # check if it was added.
     get_users =  models.ClientUsers.retrieve_all_users(get_session)
     assert len(get_users.all()) == 1
-    # check the email address to be sure the list tallies.
-    check_user = models.ClientUsers.check_client_email(get_session, 1, 'abc@gmail.com')
+    # check the username address to be sure the list tallies.
+    check_user = models.ClientUsers.check_client_username(get_session, 1, 'abc@gmail.com')
     assert check_user.admin == False
-    assert check_user.email_address == "abc@gmail.com"
+    assert check_user.username == "abc@gmail.com"
     assert check_user.client_id == 1
     
 def test_retrieve_all_users(get_session):
@@ -56,13 +56,13 @@ def test_update_client_user(get_session):
     # create the update data.
     update_data = {
         'admin': False,
-        'email_address': 'aa@gmail.com'
+        'username': 'aa@gmail.com'
     }
     # check the data before it was updated.
     get_user = models.ClientUsers.retrieve_user_by_id(get_session, 1)
     assert get_user is not None
     assert get_user.admin == True
-    assert get_user.email_address == "admin@intuitive.com"
+    assert get_user.username == "admin@intuitive.com"
     # now update.
     update_schema = UpdateClientUserSchema(**update_data)
     update_user = models.ClientUsers.update_client_user(
@@ -73,7 +73,7 @@ def test_update_client_user(get_session):
     get_user = models.ClientUsers.retrieve_user_by_id(get_session, 1)
     assert get_user is not None
     assert get_user.admin == False
-    assert get_user.email_address == "aa@gmail.com"
+    assert get_user.username == "aa@gmail.com"
     
     
     

@@ -37,11 +37,11 @@ async def validate_client_key(request: Request, db: Session=Depends(get_db)):
 async def validate_active_client(db: Session = Depends(get_db), token:str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, ACCESS_SECRET_KEY, algorithms=["HS256"])
-        # get email, client_id.
-        email = payload.get("sub")
+        # get username, client_id.
+        username = payload.get("sub")
         client_id = payload.get("client_id")
         # check if the client mail exist for that user.
-        get_user = models.ClientUsers.check_client_email(db, client_id, email)
+        get_user = models.ClientUsers.check_client_username(db, client_id, username)
         if get_user is None:
             return error_response.unauthorized_error(detail="You don't have permission to this page")
         # check if the user's account is inactive

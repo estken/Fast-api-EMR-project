@@ -9,7 +9,7 @@ from response_handler import error_response
 
 ACCESS_SECRET_KEY = os.getenv('ACCESS_SECRET_KEY')
 REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')
-ACCESS_TOKEN_EXPIRE_MINUTES = 10
+ACCESS_TOKEN_EXPIRE_MINUTES = 200
 REFRESH_TOKEN_EXPIRE_MINUTES = 30
 
 def create_token(users: ClientUsers):
@@ -31,7 +31,7 @@ def create_access_token(users: ClientUsers):
     access_token_expiry = datetime.utcnow() + access_token_expire
     # Create the access token payload.
     access_token_payload = {
-        "sub": users.email_address,
+        "sub": users.username,
         "client_id": users.client_id,
         "user_id": users.id,
         "exp": access_token_expiry
@@ -46,7 +46,7 @@ def create_refresh_token(users: ClientUsers):
     refresh_token_expiry = datetime.utcnow() + refresh_token_expire
     # Create the refresh token payload.
     refresh_token_payload = {
-        "sub": users.email_address,
+        "sub": users.username,
         "client_id": users.client_id,
         "user_id": users.id,
         "exp": refresh_token_expiry
@@ -59,20 +59,20 @@ def verify_refresh_token(db, token: str):
     try:
         payload = jwt.decode(token, REFRESH_SECRET_KEY, algorithms=["HS256"]) 
         # get the email and client_id
-        email = payload.get("sub")
+        username = payload.get("sub")
         client_id = payload.get("client_id")
         # get the user model.
-        get_user = ClientUsers.check_client_email(db, client_id, email)
+        get_user = ClientUsers.check_client_username(db, client_id, username)
         
         new_token = create_token(get_user)
         
     except jwt.ExpiredSignatureError:
-        return error_response.unauthorized_error(detail='Token has expired.')
+        return False, 'Token has expired.'
 
     except jwt.JWTError:
-        return error_response.unauthorized_error(detail="Invalid Token")
+        return False, "Invalid Token"
     
     except Exception as e:
-        return error_response.unauthorized_error(detail=str(e))
+        return False, str(e)
     
-    return new_token
+    return True, new_token
