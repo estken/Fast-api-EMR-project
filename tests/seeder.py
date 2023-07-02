@@ -37,3 +37,19 @@ def seed_client_prod(db: Session):
         client_instances = [Client(**client) for client in client_data]
         db.add_all(client_instances)
         db.commit()
+        
+def seed_client_center(db: Session):
+    from db.models import ClientCenter
+    center_data = [
+        {'client_id':1, 'center': 'client 1'},
+        {'client_id': 1, 'center': 'client 2'},
+        {'client_id': 1, 'center': 'client 3'}
+    ]
+    
+    if ClientCenter.get_center_object(db).count() == 0:
+        center_instance = [ClientCenter(**center) for center in center_data]
+        db.add_all(center_instance)
+        db.commit()
+    
+        
+        

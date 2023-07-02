@@ -78,8 +78,16 @@ class ClientCenter(Base):
         return ClientCenter.get_center_object(db).get(center_id)
     
     @staticmethod
+    def create_center(center_data: dict):
+        return ClientCenter(**center_data)
+    
+    @staticmethod
     def get_all_client_center(db: Session, client_id: int):
-        return ClientCenter.get_center_object(db).filter(client_id = client_id).all()
+        return ClientCenter.get_center_object(db).filter_by(client_id = client_id).all()
+    
+    @staticmethod
+    def get_all_center(db: Session):
+        return ClientCenter.get_center_object(db).all()
     
     @staticmethod
     def update_center(db:Session, center_id: int, update_data):

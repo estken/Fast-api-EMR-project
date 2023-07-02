@@ -23,3 +23,18 @@ class UpdateStatusSchema(BaseModel):
             
 class UpdateClientKeySchema(BaseModel):
     client_key: str
+    
+class ClientCenterSchema(BaseModel):
+    center: str
+    
+class UpdateClientCenterSchema(BaseModel):
+    center: str = None
+    status: bool = None
+    
+    @validator('status')
+    def validate_status(cls, v):
+        if v not in (True, False):
+            raise ValueError("Value must be True or False")
+        return v
+    
+    
