@@ -53,6 +53,7 @@ class Client(Base):
         for key, value in client_data.items():
             setattr(client, key, value)
         return client
+    
 class ClientUsers(Base):
     __tablename__ = 'client_users'
     id = Column(Integer, primary_key=True, index=True)
@@ -61,6 +62,8 @@ class ClientUsers(Base):
     password = Column(String(255), nullable=False)
     admin = Column(Boolean, default=False)
     status = Column(Boolean, default=True)
+    is_reset = Column(Boolean, default = False)
+    is_change = Column(Boolean, default = False)
     
     created_at = Column(TIMESTAMP(timezone=True),
                         default = datetime.utcnow(), nullable=False)
