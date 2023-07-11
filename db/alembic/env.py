@@ -6,7 +6,10 @@ import sys
 import os
 from alembic import context
 sys.path.append("..")
+from db.session import Base
+
 from db import models
+from db import center_model
 from db.connection import get_db_conn_string
 
 
@@ -23,7 +26,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-target_metadata = models.Base.metadata
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -13,7 +13,6 @@ from .seeder import (
 )
 import logging
 
-
 # Add this line to configure logging
 logging.basicConfig(level=logging.DEBUG)
 
