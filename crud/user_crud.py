@@ -26,7 +26,30 @@ from utils import (
 
 db = Session()
 hasher = PasswordHasher()
- 
+
+"""
+check if the user is required to reset the password or probably change their password to something
+"""
+def check_passord_stat(user: models.ClientUsers):
+    if user.is_reset:
+        return False, [{"is_reset": True}]
+    
+    return True, ""
+
+def set_lock(db, user: models.ClientUsers):
+    is_locked = False
+    if user.invalid_password > 5:
+        is_locked = True
+        
+    update_user_lock = {
+        "invalid_password": user.invalid_password + 1,
+        "is_locked": is_locked
+    }
+    update_user = models.ClientUsers.update_client_user(db, user.id, update_user_lock)
+    db.add(update_user)
+    db.commit()
+    db.refresh(update_user)
+    
 # user login
 def user_login(db, client_id, username, password):
     try:
@@ -38,9 +61,14 @@ def user_login(db, client_id, username, password):
             return exceptions.bad_request_error("Account is disabled")
         
         if hasher.verify(check_user.password, password):
+            # checked if password is locked here.
+            if check_user.is_locked:
+                return exceptions.forbidden_error(detail="Sorry, user's account is locked")
             get_token = create_token(check_user)
         
     except VerifyMismatchError as e:
+        # increase number.
+        set_lock(db, check_user)
         return exceptions.bad_request_error("Incorrect Password")
         
     except Exception as e:
@@ -51,8 +79,12 @@ def user_login(db, client_id, username, password):
 # create new user.
 def create_user(db, current_user: models.ClientUsers, new_user):
     try:
-        # check if the username exists.
-        check_client = models.ClientUsers.check_client_username(db, current_user.client_id, new_user.username_address.lower())
+        # check if the user is required to change or reset password.
+        bool_result, message = check_user(current_user)
+        if not bool_result:
+            return exceptions.forbidden_error(data = message)
+        # check if the username exist.
+        check_client = models.ClientUsers.check_client_username(db, current_user.client_id, new_user.username.lower())
         if check_client is not None:
             return exceptions.bad_request_error(f"user with username {new_user.username.lower()} already exists")
         # create the user
@@ -60,8 +92,9 @@ def create_user(db, current_user: models.ClientUsers, new_user):
         new_user_dict['client_id'] = current_user.client_id
         # check the password strength.
         password = new_user_dict['password']
-        if not check_password(password):
-            return exceptions.bad_request_error("Password did not meet requirement.")
+        bool_result, message = check_password(password, new_user_dict['username'])
+        if not bool_result:
+            return exceptions.bad_request_error(message)
             
         new_user_dict['password'] = hasher.hash(password)
         new_user_dict['username'] = new_user_dict['username'].lower()
@@ -93,6 +126,11 @@ def refresh_token(db, token):
 
 def get_details(db, current_user):
     try:
+        # check if the user is required to change or reset password.
+        bool_result, message = check_user(current_user)
+        if not bool_result:
+            return exceptions.forbidden_error(data = message)
+
         fields_to_remove = ['id', 'admin', 'slug', 'client_key', 'status', 'password', 'updated_at', 'created_at']  # Specify the fields you want to remove
         #filtered_data = remove_fields(current_user.__dict__, fields_to_remove)            
         filtered_data = model_to_dict(current_user.__dict__)
@@ -104,6 +142,10 @@ def get_details(db, current_user):
 
 def update_details(db, username, current_user, update_data):
     try:
+        # check if the user is required to change or reset password.
+        bool_result, message = check_user(current_user)
+        if not bool_result:
+            return exceptions.forbidden_error(data = message)
         # convert the data to dict.
         updated_dict = update_data.dict(exclude_unset=True, exclude_none=True)
         # check if the username exists for that client.
@@ -118,8 +160,7 @@ def update_details(db, username, current_user, update_data):
         if updated_dict.get('username') is not None:
             existing_user = models.ClientUsers.check_client_username(db, current_user.client_id, updated_dict['username'])
             if existing_user is not None:
-                return exceptions.bad_request_error(f"username {username} already in use.")
-        
+                return exceptions.bad_request_error(f"username {username} already in use.")        
         # update from here.
         update_user = models.ClientUsers.update_client_user(db, check_user.id, updated_dict)
         if not update_user:

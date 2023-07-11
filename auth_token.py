@@ -12,11 +12,11 @@ REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')
 ACCESS_TOKEN_EXPIRE_MINUTES = 200
 REFRESH_TOKEN_EXPIRE_MINUTES = 30
 
-def create_token(users: ClientUsers):
+def create_token(users: ClientUsers, center_id = 0):
     # create the access token.
-    access_token = create_access_token(users)
+    access_token = create_access_token(users, center_id)
     # create the refresh token.
-    refresh_token = create_refresh_token(users)
+    refresh_token = create_refresh_token(users, center_id)
     # todo: generate the page_slug, as well as permission for each users.
     
     return [{
@@ -25,7 +25,7 @@ def create_token(users: ClientUsers):
         "token_type": "bearer",
     }]        
 
-def create_access_token(users: ClientUsers):
+def create_access_token(users: ClientUsers, center_id):
     # Set the expiration time for the access token.
     access_token_expire = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token_expiry = datetime.utcnow() + access_token_expire
@@ -34,13 +34,14 @@ def create_access_token(users: ClientUsers):
         "sub": users.username,
         "client_id": users.client_id,
         "user_id": users.id,
-        "exp": access_token_expiry
+        "exp": access_token_expiry,
+        "center_id": center_id
     }
     # encode the token.
     encoded_jwt = jwt.encode(access_token_payload, ACCESS_SECRET_KEY, algorithm="HS256")
     return encoded_jwt
     
-def create_refresh_token(users: ClientUsers):
+def create_refresh_token(users: ClientUsers, center_id):
     # Set the expiration time for the refresh token.
     refresh_token_expire = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
     refresh_token_expiry = datetime.utcnow() + refresh_token_expire
@@ -49,7 +50,8 @@ def create_refresh_token(users: ClientUsers):
         "sub": users.username,
         "client_id": users.client_id,
         "user_id": users.id,
-        "exp": refresh_token_expiry
+        "exp": refresh_token_expiry,
+        "center_id": center_id
     }
     # encode the token.
     encoded_jwt = jwt.encode(refresh_token_payload, REFRESH_SECRET_KEY, algorithm="HS256")
@@ -61,10 +63,11 @@ def verify_refresh_token(db, token: str):
         # get the email and client_id
         username = payload.get("sub")
         client_id = payload.get("client_id")
+        center_id = payload.get("center_id")
         # get the user model.
         get_user = ClientUsers.check_client_username(db, client_id, username)
         
-        new_token = create_token(get_user)
+        new_token = create_token(get_user, center_id)
         
     except jwt.ExpiredSignatureError:
         return False, 'Token has expired.'

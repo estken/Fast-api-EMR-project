@@ -63,8 +63,9 @@ class ClientUsers(Base):
     admin = Column(Boolean, default=False)
     status = Column(Boolean, default=True)
     is_reset = Column(Boolean, default = False)
-    is_change = Column(Boolean, default = False)
-    
+    is_locked = Column(Boolean, default = False)
+    invalid_password = Column(Integer, nullable=False, default=0)
+       
     created_at = Column(TIMESTAMP(timezone=True),
                         default = datetime.utcnow(), nullable=False)
     updated_at = Column(TIMESTAMP(timezone=True),

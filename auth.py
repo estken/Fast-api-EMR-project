@@ -6,6 +6,7 @@ from db import models
 from jose import jwt
 from response_handler import error_response
 from fastapi.security import OAuth2PasswordBearer
+from crud.user_crud import check_passord_stat
 
 import os
 
@@ -46,10 +47,14 @@ async def validate_active_client(db: Session = Depends(get_db), token:str = Depe
             return error_response.unauthorized_error(detail="You don't have permission to this page")
         # check if the user's account is inactive
         if not get_user.status:
-            return error_response.unauthorized_error(detail="Your account is inactive")
+            return error_response.forbidden_error(detail="Your account is inactive")
         # check if the client account is inactive.
         if not get_user.client.status:
-            return error_response.unauthorized(detail="Client is inactive")
+            return error_response.forbidden_error(detail="Client is inactive")
+        # check if the account requires password reset or change.
+        bool_result, message = check_passord_stat(get_user)
+        if not bool_result:
+            return error_response.forbidden_error(data=message)
     # jwt token error
     except jwt.ExpiredSignatureError:
         return error_response.unauthorized_error(detail='Token has expired.')
