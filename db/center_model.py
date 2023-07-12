@@ -12,6 +12,7 @@ class ClientCenter(Base):
     id = Column(Integer, primary_key=True, index= True)
     client_id = Column(Integer, ForeignKey("client.id"), nullable=False)
     center = Column(String(100), nullable = False)
+    slug = Column(String(100), nullable = False, unique=True)
     status = Column(Boolean, default= True)
     created_at = Column(TIMESTAMP(timezone=True),
                         default = datetime.utcnow(), nullable=False)
@@ -21,6 +22,15 @@ class ClientCenter(Base):
     # relationship part.
     client = relationship('Client', back_populates="client_centers")
     
+    def __init__(self, center, client_id, status):
+        self.center = center
+        self.client_id = client_id
+        self.status = status
+        self.slug = self.generate_slug(self.center[:10] + str(self.client_id))
+        
+    def generate_slug(self):
+        
+        
     @staticmethod
     def get_center_object(db: Session):
         return db.query(ClientCenter)

@@ -30,11 +30,37 @@ class ClientCenterSchema(BaseModel):
 class UpdateClientCenterSchema(BaseModel):
     center: str = None
     status: bool = None
+class ClientUserSchema(BaseModel):
+    username: str
+    password: str = Field(min_length=8)
+    admin: bool = False
+    
+    @validator('admin')
+    def validate_admin(cls, v):
+        if v not in (True, False):
+            raise ValueError("Value must be True or False")
+        return v
+
+class UpdateClientUserSchema(BaseModel):
+    username: str = None
+    group_slug: str = None
+    admin: bool = None
+    status: bool = None
+       
+    @validator('admin')
+    def validate_admin(cls, v):
+        if v not in (True, False):
+            raise ValueError("Value must be True or False")
+        return v
     
     @validator('status')
     def validate_status(cls, v):
         if v not in (True, False):
             raise ValueError("Value must be True or False")
         return v
+        
+class refreshTokenSchema(BaseModel):
+    refresh_token: str
     
-    
+class UpdateClientPasswordSchema(BaseModel):
+    password: str

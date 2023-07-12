@@ -7,11 +7,13 @@ from sqlalchemy.orm import Session as session_local
 from db import models
 from db.session import get_db
 from apis.client import client_router
+from apis.client_user import user_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn, asyncio
 import os, uuid, multiprocessing
 from tests.seeder import (
-    seed_client_prod
+    seed_client_prod,
+    seed_client_user_prod
 )
 
 # Microservice description
@@ -62,11 +64,16 @@ async def main() -> None:
 access_control_app.include_router(
     client_router
 )
+# include the user router.
+access_control_app.include_router(
+    user_router
+)
 
 @access_control_app.on_event("startup")
 async def startup_event():
     db = Session()
     seed_client_prod(db)
+    seed_client_user_prod(db)
     db.close()
     
     
