@@ -39,7 +39,7 @@ def create_new_user(new_user: ClientUserSchema, db: Session = Depends(get_db),
     return user_crud.create_user(db, current_user, new_user)
 
 
-@user_router.post("/admin_login", summary="Login into the Client user account", status_code=200, dependencies=[Depends(validate_client_key)])
+@user_router.post("/admin/login", summary="Login into the Client user account", status_code=200, dependencies=[Depends(validate_client_key)])
 async def user_login(request: Request, login_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # get the client id
     client_id = request.state.data
@@ -49,7 +49,7 @@ async def user_login(request: Request, login_data: OAuth2PasswordRequestForm = D
     
     return user_crud.admin_login(db, client_id, user_email, user_password)
 
-@user_router.post("/refresh_token", summary="Refresh Expired token of logged in users.", status_code=200)
+@user_router.post("/refresh/token", summary="Refresh Expired token of logged in users.", status_code=200)
 async def refresh_token(refresh_token: refreshTokenSchema, db: Session = Depends(get_db)):
     return user_crud.refresh_token(db, refresh_token.refresh_token)
 

@@ -2,8 +2,7 @@ from sqlalchemy.orm import Session
 import sys
 sys.path.append("..")
 import uuid
-# import password hashing mechanism.
-from argon2 import PasswordHasher
+from argon2 import PasswordHasher #password hashing mechanism.
         
 def seed_client(db: Session):
     from db.models import Client

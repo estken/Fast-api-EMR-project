@@ -32,6 +32,7 @@ def create_access_token(users: ClientUsers, center_id):
         "sub": users.username,
         "client_id": users.client_id,
         "user_id": users.id,
+        "selected_id": users.client_id,
         "exp": access_token_expiry,
         "center_id": center_id
     }
@@ -48,6 +49,7 @@ def create_refresh_token(users: ClientUsers, center_id):
         "sub": users.username,
         "client_id": users.client_id,
         "user_id": users.id,
+        "selected_id": users.client_id,
         "exp": refresh_token_expiry,
         "center_id": center_id
     }
