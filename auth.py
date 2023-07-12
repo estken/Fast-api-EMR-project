@@ -6,7 +6,7 @@ from db import models
 from jose import jwt
 from response_handler import error_response
 from fastapi.security import OAuth2PasswordBearer
-from crud.user_crud import check_passord_stat
+from crud.user_crud import check_password_stat
 
 import os
 
@@ -52,7 +52,7 @@ async def validate_active_client(db: Session = Depends(get_db), token:str = Depe
         if not get_user.client.status:
             return error_response.forbidden_error(detail="Client is inactive")
         # check if the account requires password reset or change.
-        bool_result, message = check_passord_stat(get_user)
+        bool_result, message = check_password_stat(get_user)
         if not bool_result:
             return error_response.forbidden_error(data=message)
     # jwt token error
