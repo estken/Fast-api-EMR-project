@@ -9,7 +9,7 @@ sys.path.append("..")
 from db.session import Base
 
 from db import models
-from db import center_model
+from db import user_model
 from db.connection import get_db_conn_string
 
 
