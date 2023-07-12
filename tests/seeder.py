@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 import sys
 sys.path.append("..")
 import uuid
+from argon2 import PasswordHasher #password hashing mechanism.
         
 def seed_client(db: Session):
     from db.models import Client
@@ -36,4 +37,39 @@ def seed_client_prod(db: Session):
     if not existing_clients:
         client_instances = [Client(**client) for client in client_data]
         db.add_all(client_instances)
+        db.commit()
+
+def seed_client_users(db: Session):
+    from db.models import ClientUsers
+    client_user_data = [
+        {'client_id':1, 'username': 'admin@intuitive.com', 'password': 'Qwerty123@', 'admin': True},
+        {'client_id':2, 'username': 'ab@gmail.com', 'password': 'Qwerty123@'},
+    ]
+    
+    if ClientUsers.client_user_object(db).count() == 0:
+        user_instance = []
+        hash_pw = PasswordHasher()
+        for user in client_user_data:
+            hashed = hash_pw.hash(user['password'])
+            user['password'] = hashed
+            user_instance.append(ClientUsers(**user))
+              
+        db.add_all(user_instance)
+        db.commit()
+        
+def seed_client_user_prod(db: Session):
+    from db.models import ClientUsers
+    client_user_data = [
+        {'client_id':1, 'username': 'admin@intuitive.com', 'password': 'Qwerty123@', 'admin': True}
+    ]
+    
+    if ClientUsers.client_user_object(db).count() == 0:
+        user_instance = []
+        hash_pw = PasswordHasher()
+        for user in client_user_data:
+            hashed = hash_pw.hash(user['password'])
+            user['password'] = hashed
+            user_instance.append(ClientUsers(**user))
+              
+        db.add_all(user_instance)
         db.commit()

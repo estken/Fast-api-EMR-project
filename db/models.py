@@ -1,10 +1,10 @@
-# for models.
 from .session import Base
 from sqlalchemy import Column, Enum, Integer, String, Boolean, TIMESTAMP, ForeignKey, Float, JSON, TEXT
 from sqlalchemy.orm import Session, load_only, relationship
 import uuid
 from datetime import datetime
 from sqlalchemy.sql import text
+from .user_model import ClientUsers
 import sys
 sys.path.append("..")
 
@@ -19,13 +19,14 @@ class Client(Base):
                         default = datetime.utcnow(), nullable=False)
     updated_at = Column(TIMESTAMP(timezone=True),
                         default=datetime.utcnow(), 
-                        onupdate=datetime.utcnow(), nullable=False)
-    
+                        onupdate=datetime.utcnow(), nullable=False)    
+    # relationship
+    client_users = relationship("ClientUsers", back_populates="client")
     # get the client object
     @staticmethod
     def get_client_object(db: Session):
         return db.query(Client)
-                               
+                              
     # get the client by ID
     @staticmethod
     def get_client_by_id(db: Session, id: int):
