@@ -24,6 +24,12 @@ class UpdateStatusSchema(BaseModel):
 class UpdateClientKeySchema(BaseModel):
     client_key: str
     
+class ClientCenterSchema(BaseModel):
+    center: str
+    
+class UpdateClientCenterSchema(BaseModel):
+    center: str = None
+    status: bool = None
 class ClientUserSchema(BaseModel):
     username: str
     password: str = Field(min_length=8)
@@ -51,10 +57,16 @@ class UpdateClientUserSchema(BaseModel):
     def validate_status(cls, v):
         if v not in (True, False):
             raise ValueError("Value must be True or False")
-        return v 
-    
+        return v
+        
 class refreshTokenSchema(BaseModel):
     refresh_token: str
     
 class UpdateClientPasswordSchema(BaseModel):
     password: str
+    
+class ClientCenterSchema(BaseModel):
+    center: str
+    
+class ClientCenterSlugSchema(BaseModel):
+    slug: str

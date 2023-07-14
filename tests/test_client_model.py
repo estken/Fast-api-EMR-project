@@ -1,7 +1,7 @@
 from .conftest import get_session
 import sys
 sys.path.append("..")
-from db import models
+from db import client_model as models
 from schema import ClientSchema, UpdateStatusSchema
 import uuid
 
@@ -115,14 +115,3 @@ def test_update_client_status(get_session):
     assert get_details.slug == client_1.slug
     assert get_details.client_key == client_1.client_key
     assert get_details.status == False
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    

@@ -2,7 +2,7 @@
 from fastapi import Depends, HTTPException, Request
 from db.session import get_db
 from sqlalchemy.orm import Session
-from db import models
+from db import client_model as models
 from jose import jwt
 from response_handler import error_response
 from fastapi.security import OAuth2PasswordBearer
@@ -65,4 +65,4 @@ async def validate_active_client(db: Session = Depends(get_db), token:str = Depe
     except Exception as e:
         return error_response.unauthorized_error(detail=str(e))
     
-    return get_user
+    return payload

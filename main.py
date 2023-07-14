@@ -4,10 +4,11 @@ from fastapi import FastAPI, Depends
 from schema import *
 from db.session import Base, engine, Session
 from sqlalchemy.orm import Session as session_local
-from db import models
+from db import client_model as models
 from db.session import get_db
 from apis.client import client_router
 from apis.client_user import user_router
+from apis.client_center import center_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn, asyncio
 import os, uuid, multiprocessing
@@ -67,6 +68,10 @@ access_control_app.include_router(
 # include the user router.
 access_control_app.include_router(
     user_router
+)
+# include the center router.
+access_control_app.include_router(
+    center_router
 )
 
 @access_control_app.on_event("startup")

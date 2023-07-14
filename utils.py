@@ -2,7 +2,7 @@
 from password_strength import PasswordPolicy
 import datetime
 import re
-from db.models import ClientUsers
+from db.user_model import ClientUsers
 
 # setup the password policy.
 policy = PasswordPolicy.from_names(
@@ -83,3 +83,11 @@ def model_to_dict(data):
         return value
     
     return {key: convert_value(value) for key, value in data.items()}
+
+# This function gets the user from the decoded access token.
+def get_active_user(db, payload: dict):
+    username = payload.get("sub")
+    client_id = payload.get("client_id")
+    
+    return ClientUsers.check_client_username(
+        db, client_id, username)

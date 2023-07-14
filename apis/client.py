@@ -5,8 +5,8 @@ sys.path.append("..")
 from db.session import get_db
 from schema import ClientSchema, UpdateStatusSchema, UpdateClientKeySchema
 from crud import client_crud
-from db import models
-from auth import validate_client_key
+from db import client_model as models
+from auth import validate_client_key, validate_active_client
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
@@ -45,3 +45,9 @@ async def update_client_key(request: Request, client_key: UpdateClientKeySchema,
 @client_router.get('/', summary="Get all clients status and slugname", status_code=200)
 async def get_all_client(page: int = Query(1, ge=1), page_size: int = 10, db: Session=Depends(get_db)):
     return client_crud.get_all_clients(db, page, page_size)
+
+@client_router.post('/change/{client_slug}', summary="Select or change to another client", status_code=200)
+async def change_client(client_slug: str, 
+                        db: Session = Depends(get_db), current_user: dict = Depends(validate_active_client)):
+    
+    return client_crud.change_client(db, client_slug, current_user)

@@ -1,7 +1,7 @@
 from .conftest import get_session, client_instance
 import sys
 sys.path.append("..")
-from db import models
+from db import client_model as models
 from schema import ClientSchema, UpdateStatusSchema, UpdateClientKeySchema
 import uuid
 from fastapi import status
@@ -12,7 +12,6 @@ from .seeder import (
     seed_client
 )
 import logging
-
 
 # Add this line to configure logging
 logging.basicConfig(level=logging.DEBUG)

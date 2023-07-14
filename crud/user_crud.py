@@ -5,7 +5,7 @@ sys.path.append("..")
 from utils import *
 from auth_token import *
 from typing import List
-from db import models
+from db import client_model as models
 from db.session import Session
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -31,7 +31,6 @@ def filter_fields(user: models.ClientUsers, fields: list):
     filtered_data = model_to_dict(user.__dict__)
     user_data = remove_fields(filtered_data, fields) 
     return user_data
-    
 
 """
 check if the user is required to reset the password or probably change their password to something
@@ -86,21 +85,24 @@ def user_login(db, client_id, username, password):
     except VerifyMismatchError as e:
         # increase number.
         set_lock(db, check_user)
-        return exceptions.bad_request_error("Incorrect Password")
+        return exceptions.bad_request_error("Incorrect Username or Password")
         
     except Exception as e:
         return exceptions.server_error(detail=str(e))
     
 # create new user.
-def create_user(db, current_user: models.ClientUsers, new_user):
+def create_user(db, user_payload, new_user):
     try:
+        # get the current_user from the user payload.
+        selected_client_id = user_payload.get("selected_client_id")
+        current_user = get_active_user(db, user_payload)
         # check if the username exist.
-        check_client = models.ClientUsers.check_client_username(db, current_user.client_id, new_user.username.lower())
+        check_client = models.ClientUsers.check_client_username(db, selected_client_id, new_user.username.lower())
         if check_client is not None:
             return exceptions.bad_request_error(f"user with username {new_user.username.lower()} already exists")
         # create the user
         new_user_dict = new_user.dict(exclude_unset = True)
-        new_user_dict['client_id'] = current_user.client_id
+        new_user_dict['client_id'] = selected_client_id
         # check the password strength.
         password = new_user_dict['password']
         bool_result, message = check_password(password, new_user_dict['username'])
@@ -136,12 +138,14 @@ def refresh_token(db, token):
     
     return success_response.success_message(token_data)
 
-def get_details(db, current_user):
+def get_details(db, user_payload):
     try:
         fields_to_remove = ['id', 'admin', 'slug', 'client_key', 
                             'status', 'password', 'updated_at', 
                             'created_at', 'is_reset', 'invalid_password',
                             'is_locked', 'client']  # Specify the fields you want to remove
+        
+        current_user = get_active_user(db, user_payload)
         user_data = filter_fields(current_user, fields_to_remove)
         
         return success_response.success_message(user_data)
@@ -150,10 +154,12 @@ def get_details(db, current_user):
         return exceptions.server_error(detail=str(e))
     
 
-def update_details(db, username, current_user, update_data):
+def update_details(db, username, user_payload, update_data):
     try:
         # convert the data to dict.
         updated_user_dict = update_data.dict(exclude_unset=True, exclude_none=True)
+        # get the current_user from the user payload.
+        current_user = get_active_user(db, user_payload)
         # check if the username exists for that client.
         check_user = models.ClientUsers.check_client_username(db, current_user.client_id, username.lower())
         if check_user is None:

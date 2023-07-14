@@ -10,7 +10,7 @@ from schema import (
     UpdateClientUserSchema
 )
 from crud import user_crud
-from db import models
+from db import client_model as models
 from auth import validate_client_key
 from auth import validate_active_client
 from fastapi.responses import JSONResponse
@@ -34,7 +34,7 @@ async def user_login(request: Request, login_data: OAuth2PasswordRequestForm = D
 
 @user_router.post("/create", summary="Create a new User for the client", status_code=201)
 def create_new_user(new_user: ClientUserSchema, db: Session = Depends(get_db), 
-                    current_user: models.ClientUsers = Depends(validate_active_client)):
+                    current_user:dict = Depends(validate_active_client)):
     
     return user_crud.create_user(db, current_user, new_user)
 
@@ -54,11 +54,11 @@ async def refresh_token(refresh_token: refreshTokenSchema, db: Session = Depends
     return user_crud.refresh_token(db, refresh_token.refresh_token)
 
 @user_router.get('/view', summary="View Single User Information", status_code=200)
-async def view_detail(current_user: models.ClientUsers = Depends(validate_active_client), db: Session = Depends(get_db)):
+async def view_detail(current_user:dict = Depends(validate_active_client), db: Session = Depends(get_db)):
     return user_crud.get_details(db, current_user)
 
 @user_router.patch('/update/{username}', summary="Update the User Information", status_code=200)
-async def update_user(username: str, update_data: UpdateClientUserSchema, current_user: models.ClientUsers = Depends(validate_active_client), 
+async def update_user(username: str, update_data: UpdateClientUserSchema, current_user : dict = Depends(validate_active_client), 
                       db: Session = Depends(get_db)):
     return user_crud.update_details(db, username, current_user, update_data)
     
