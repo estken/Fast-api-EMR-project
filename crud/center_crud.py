@@ -80,7 +80,39 @@ def update_center(db, user_payload, update_center_data, center_slug):
     
     except Exception as e:
         return exceptions.server_error(detail=str(e))
-    
+
+def update_center_status(db, user_payload, center_slug, state):
+    """This function updates a centers status"""
+    try:
+        # first check if the center id exists or not.
+        check_center = models.ClientCenter.check_slug(db, center_slug.slug)
+        if check_center is None:
+            return exceptions.bad_request_error("Sorry Center does not exists")
+        # check if the client id doesn't tally with the center_id client
+        if check_center.client_id != user_payload.get("client_id"):
+            return exceptions.bad_request_error("Center doesn't belong to Client")
+        
+        if state == check_center.status:
+            if state:
+                return exceptions.bad_request_error("Center is already Enabled")
+            return exceptions.bad_request_error("Center is already Disabled")
+        # get the center id.
+        center_id = check_center.id
+        # update right away.
+        update_center = models.ClientCenter.update_center(db, center_id, {'status': state})
+        
+        if update_center is None:
+            return exceptions.bad_request_error("An error occurred while updating data")
+        db.add(update_center)
+        db.commit()
+        db.refresh(update_center)
+        
+        return success_response.success_message(update_center, "update was carried out successfully")
+        
+        
+    except Exception as e:
+        return exceptions.server_error(detail=str(e))
+
 def get_center(db, user_payload, center_slug):
     try:
         # check if slug exists.
@@ -93,5 +125,16 @@ def get_center(db, user_payload, center_slug):
 
         return success_response.success_message(check_center)
     
+    except Exception as e:
+        return exceptions.server_error(detail=str(e))
+        
+def get_centers(db, user_payload):
+    try:
+        # get the user payload for the centers.
+        selected_client_id = user_payload.get("selected_client_id")
+        centers = models.ClientCenter.get_all_client_center(db, selected_client_id)
+        
+        return success_response.success_message(centers)
+        
     except Exception as e:
         return exceptions.server_error(detail=str(e))

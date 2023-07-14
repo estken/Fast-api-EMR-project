@@ -7,7 +7,7 @@ from response_handler import error_response
 
 ACCESS_SECRET_KEY = os.getenv('ACCESS_SECRET_KEY')
 REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')
-ACCESS_TOKEN_EXPIRE_MINUTES = 1000
+ACCESS_TOKEN_EXPIRE_MINUTES = 10
 REFRESH_TOKEN_EXPIRE_MINUTES = 30
 
 def create_token(users: ClientUsers, center_id = 0, selected_client_id=0):

@@ -67,3 +67,6 @@ class UpdateClientPasswordSchema(BaseModel):
     
 class ClientCenterSchema(BaseModel):
     center: str
+    
+class ClientCenterSlugSchema(BaseModel):
+    slug: str

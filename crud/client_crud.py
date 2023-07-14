@@ -93,6 +93,11 @@ def get_all_clients(db, page: int, page_size: int):
     
 def change_client(db, client_slug, user_payload):
     try:
+        # get the active client (logged in client)
+        get_user = get_active_user(db, user_payload)
+        # check if the user is actual an admin or not.
+        if not get_user.admin:
+            return exceptions.bad_request_error("Error, User does not have that privilege")
         # check if the client_slug exists.
         find_client = models.Client.get_client_object(db).filter_by(
             slug=client_slug
@@ -100,9 +105,6 @@ def change_client(db, client_slug, user_payload):
         
         if find_client is None:
             return exceptions.bad_request_error(detail=f"Client with slug {client_slug} doesn't exist")
-        
-        # get the active client (logged in client)
-        get_user = get_active_user(db, user_payload)
         # regenerate the token.
         new_token = create_token(get_user, selected_client_id = find_client.id)    
         return success_response.success_message(new_token)
