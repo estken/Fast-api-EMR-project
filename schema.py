@@ -64,3 +64,6 @@ class refreshTokenSchema(BaseModel):
     
 class UpdateClientPasswordSchema(BaseModel):
     password: str
+    
+class ClientCenterSchema(BaseModel):
+    center: str

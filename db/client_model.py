@@ -1,4 +1,3 @@
-# for models.
 from .session import Base
 from sqlalchemy import Column, Enum, Integer, String, Boolean, TIMESTAMP, ForeignKey, Float, JSON, TEXT
 from sqlalchemy.orm import Session, load_only, relationship
@@ -6,6 +5,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy.sql import text
 from .user_model import ClientUsers
+from .center_model import ClientCenter
 import sys
 sys.path.append("..")
 
@@ -23,6 +23,7 @@ class Client(Base):
                         onupdate=datetime.utcnow(), nullable=False)    
     # relationship
     client_users = relationship("ClientUsers", back_populates="client")
+    client_centers = relationship("ClientCenter", back_populates="client")
     # get the client object
     @staticmethod
     def get_client_object(db: Session):

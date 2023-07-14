@@ -1,7 +1,7 @@
 from .conftest import get_session
 import sys
 sys.path.append("..")
-from db import models
+from db import client_model as models
 from schema import ClientUserSchema, UpdateClientUserSchema
 import uuid
 from .seeder import seed_client, seed_client_users

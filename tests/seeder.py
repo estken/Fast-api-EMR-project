@@ -2,11 +2,10 @@ from sqlalchemy.orm import Session
 import sys
 sys.path.append("..")
 import uuid
-# import password hashing mechanism.
-from argon2 import PasswordHasher
+from argon2 import PasswordHasher #password hashing mechanism.
         
 def seed_client(db: Session):
-    from db.models import Client
+    from db.client_model import Client
     client_data = [
         {'slug': 'client-f','client_key': "new_key"},
         {'slug': 'client-a','client_key': "new_key2"},
@@ -28,7 +27,7 @@ def seed_client(db: Session):
         db.commit()
         
 def seed_client_prod(db: Session):
-    from db.models import Client
+    from db.client_model import Client
     client_data = [
         {'slug': 'intuitive','client_key': "intuitive_key"}
     ]
@@ -41,7 +40,7 @@ def seed_client_prod(db: Session):
         db.commit()
         
 def seed_client_center(db: Session):
-    from db.models import ClientCenter
+    from db.client_model import ClientCenter
     center_data = [
         {'client_id':1, 'center': 'client 1'},
         {'client_id': 1, 'center': 'client 2'},
@@ -54,7 +53,7 @@ def seed_client_center(db: Session):
         db.commit()
     
 def seed_client_users(db: Session):
-    from db.models import ClientUsers
+    from db.client_model import ClientUsers
     client_user_data = [
         {'client_id':1, 'username': 'admin@intuitive.com', 'password': 'Qwerty123@', 'admin': True},
         {'client_id':2, 'username': 'ab@gmail.com', 'password': 'Qwerty123@'},
@@ -72,7 +71,7 @@ def seed_client_users(db: Session):
         db.commit()
         
 def seed_client_user_prod(db: Session):
-    from db.models import ClientUsers
+    from db.client_model import ClientUsers
     client_user_data = [
         {'client_id':1, 'username': 'admin@intuitive.com', 'password': 'Qwerty123@', 'admin': True}
     ]
