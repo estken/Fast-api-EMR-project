@@ -72,6 +72,7 @@ Follow these steps to set up the necessary environment variables:
 - Save it.
 
 6 Ensure you have your database server start up. 
+
 7 Create the database with name 'access_control_app'. you can do this manually or which ever way is convenient for you.
 
 8 Run migrations to prepare the models or table to be added to the database, using:
