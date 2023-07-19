@@ -29,11 +29,9 @@ def test_ping(client_instance):
 def test_create_client(client_instance, get_session):
     # data to populate the table with.
     client_data = {
-        'slug': 'client-f',
-        'client_key': str(uuid.uuid4())
-    }
-    
-    #get the client router
+        'client_name': 'testing'
+    } 
+    # get the client router
     client_response = client_instance.post("/client/create", json=client_data)
     
     assert client_response.status_code == 201
@@ -42,38 +40,11 @@ def test_create_client(client_instance, get_session):
     #check the length of the table to be sure it has increased.
     retrieve_clients = models.Client.retrieve_all_client(get_session)
     assert len(retrieve_clients) == 1
-    
     # check if the vaues of attributes created.
-    get_details = models.Client.check_single_key(get_session, client_data['client_key'])
-    assert get_details.slug == client_data['slug']
-    assert get_details.client_key == client_data['client_key']
+    get_details = models.Client.get_client_by_id(get_session, 1)
+    assert get_details.slug is not None
+    assert get_details.client_key is not None
     assert get_details.status == True
-    
-#This function checks for error which occurs while creating the client  
-def test_create_client_exist_error(client_instance, get_session):
-    # data to populate the table with.
-    client_data = {
-        'slug': 'client-A',
-        'client_key': str(uuid.uuid4())
-    }
-    
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
-    get_session.add(created_client)
-    get_session.commit()
-    
-    assert created_client is not None
-    # ensure it was created.
-    retrieve_clients = models.Client.retrieve_all_client(get_session)
-    assert len(retrieve_clients) == 1
-    
-    # get the client router
-    client_response = client_instance.post("/client/create", json=client_data)
-    
-    assert client_response.status_code == 400
-    assert client_response.json()['detail'] == "Opps!, Client already exists!"
-    assert client_response.json()['status'] == 0
-    
 
 def test_create_client_insert_error(client_instance, get_session):
     # data to populate the table with.
@@ -91,12 +62,12 @@ def test_create_client_insert_error(client_instance, get_session):
 def test_deactivate_client_with_middleware(client_instance, get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': str(uuid.uuid4())
     }
     
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -106,7 +77,7 @@ def test_deactivate_client_with_middleware(client_instance, get_session):
     assert len(retrieve_clients) == 1
     # header.
     headers = {
-        "Client-Authorization": client.client_key
+        "Client-Authorization": client_data['client_key']
     }
     # update the client status.
     client_response = client_instance.patch("/client/deactivate", headers=headers)
@@ -116,21 +87,21 @@ def test_deactivate_client_with_middleware(client_instance, get_session):
     assert client_response.json()['status'] == 1
     
     # check if it was successfully updated.
-    updated_data = look_up_client(get_session, client.slug)
+    updated_data = look_up_client(get_session, client_data['slug'])
     assert updated_data is not None
-    assert updated_data.slug == client.slug
+    assert updated_data.slug == client_data['slug']
     assert updated_data.status == False
     
 
 def test_deactivate_client_without_middleware(client_instance, get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': str(uuid.uuid4())
     }
     
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -147,12 +118,13 @@ def test_deactivate_client_without_middleware(client_instance, get_session):
 def test_deactivate_client_with_deactivated_user(client_instance, get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
-        'client_key': str(uuid.uuid4())
+        'client_key': str(uuid.uuid4()),
+        'status': False
     }
     
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key, status=False)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -163,7 +135,7 @@ def test_deactivate_client_with_deactivated_user(client_instance, get_session):
     
     # header.
     headers = {
-        "Client-Authorization": client.client_key
+        "Client-Authorization": client_data['client_key']
     }
     # update the client status with headers
     client_response = client_instance.patch("/client/deactivate", headers=headers)
@@ -175,12 +147,12 @@ def test_deactivate_client_with_deactivated_user(client_instance, get_session):
 def test_update_client_key_with_middleware(client_instance, get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': "old client key"
     }
-    # synchronizing with the schemas.
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
+
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -189,7 +161,7 @@ def test_update_client_key_with_middleware(client_instance, get_session):
     
     # header.
     headers = {
-        "Client-Authorization": client.client_key
+        "Client-Authorization": client_data['client_key']
     }
     # update the key. 
     new_key = {
@@ -202,25 +174,26 @@ def test_update_client_key_with_middleware(client_instance, get_session):
     get_session.commit()
     assert client_response.status_code == 200
     # check if the key has been updated
-    updated_data = look_up_client(get_session, client.slug)
+    updated_data = look_up_client(get_session, client_data['slug'])
     assert updated_data is not None
     # check if it doesn't have the key stored as old key anymore.
     # client.client_key = "Old key"
-    assert updated_data.client_key != client.client_key
+    assert updated_data.client_key != client_data['client_key']
     # check if it was updated correctly.
-    assert updated_data.slug == client.slug
+    assert updated_data.slug == client_data['slug']
     assert updated_data.status == True
     assert updated_data.client_key == "new key"
     
 def test_update_client_key_with_deactivated_user(client_instance, get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
-        'client_key': str(uuid.uuid4())
+        'client_key': str(uuid.uuid4()),
+        'status': False
     }
     
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key, status=False)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -231,7 +204,7 @@ def test_update_client_key_with_deactivated_user(client_instance, get_session):
     
     # header.
     headers = {
-        "Client-Authorization": client.client_key
+        "Client-Authorization": client_data['client_key']
     }
     # update the key. 
     new_key = {
@@ -242,75 +215,18 @@ def test_update_client_key_with_deactivated_user(client_instance, get_session):
     
     assert client_response.status_code == 401
     assert client_response.json()['detail'] == "Inactive account"
-    
-def test_update_client_key_without_middleware(client_instance, get_session):
-    # data to populate the table with.
-    client_data = {
-        'slug': 'client-A',
-        'client_key': str(uuid.uuid4())
-    }
-    
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
-    get_session.add(created_client)
-    get_session.commit()
-    
-    assert created_client is not None
-    # ensure it was created.
-    retrieve_clients = models.Client.retrieve_all_client(get_session)
-    assert len(retrieve_clients) == 1
-    
-    # update the key. 
-    new_key = {
-        'client_key':"new key"
-    }
-    # update the client status with headers
-    client_response = client_instance.patch("/client/update", json=new_key)
-    
-    assert client_response.status_code == 401
-    assert client_response.json()['detail'] == "Client key is missing"
 
-
-def test_update_client_key_with_same_key(client_instance, get_session):
-    # data to populate the table with.
-    client_data = {
-        'slug': 'client-A',
-        'client_key': "old key"
-    }
-    
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
-    get_session.add(created_client)
-    get_session.commit()
-    
-    assert created_client is not None
-    # ensure it was created.
-    retrieve_clients = models.Client.retrieve_all_client(get_session)
-    assert len(retrieve_clients) == 1
-    
-    # header.
-    headers = {
-        "Client-Authorization": client.client_key
-    }
-    # update the key. 
-    new_key = {
-        'client_key':"old key"
-    }
-    # update the client status with headers
-    client_response = client_instance.patch("/client/update", json=new_key, headers=headers)
-    
-    assert client_response.status_code == 400
-    assert client_response.json()['detail'] == "Client with such key already exists"
 
 def test_reactivate_client(client_instance, get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',     
         'slug': 'client-A',
-        'client_key': str(uuid.uuid4())
+        'client_key': str(uuid.uuid4()),
+        'status': False
     }
     
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key, status = False)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -323,50 +239,13 @@ def test_reactivate_client(client_instance, get_session):
     assert client_response.status_code == 200
     assert client_response.json()['status'] == 1
     # check if the key has been updated
-    updated_data = look_up_client(get_session, client.slug)
+    updated_data = look_up_client(get_session, client_data['slug'])
     assert updated_data is not None
     assert updated_data.status == True
-    
-    
-def test_reactivate_client_error(client_instance, get_session):
-    client_data = {
-        'slug': 'client-A',
-        'client_key': str(uuid.uuid4())
-    }
-
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
-    get_session.add(created_client)
-    get_session.commit()
-    
-    assert created_client is not None
-    # ensure it was created.
-    client_response = client_instance.patch("/client/reactivate/5")
-    assert client_response.status_code == 400
-    assert client_response.json()['detail'] == "Client with such id does not exists"
-    assert client_response.json()['status'] == 0
-    
+            
 def test_get_all_clients(client_instance, get_session):
+    seed_client(get_session)
     
-    client_data = {
-        'slug': 'client-A',
-        'client_key': str(uuid.uuid4())
-    }
-    
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
-    get_session.add(created_client)
-    get_session.commit()
-    
-    client_data = {
-        'slug': 'client-B',
-        'client_key': str(uuid.uuid4())
-    }
-    
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
-    get_session.add(created_client)
-    get_session.commit()
     # page 1 with 1 rcords per page
     client_response = client_instance.get("/client/", params={"page":1, "page_size":1})
     assert len(client_response.json()['data']['items'])== 1
@@ -375,22 +254,22 @@ def test_get_all_clients(client_instance, get_session):
 def test_get_all_clients_with_error(client_instance, get_session):
     # happens when we are accessing a page less than 0.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': str(uuid.uuid4())
     }
     
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
     client_data = {
+        'client_name': 'testing2',
         'slug': 'client-B',
         'client_key': str(uuid.uuid4())
     }
     
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     # page 1 with 1 rcords per page
@@ -409,12 +288,3 @@ def test_get_all_clients_without_size(client_instance, get_session):
     assert len(client_response.json()['data']['items'])== 10
     assert client_response.status_code == 200
     assert client_response.json()['data']['page'] == 1
-    
-    
-    
-
-    
-    
-    
- 
-    

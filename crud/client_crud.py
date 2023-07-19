@@ -19,18 +19,47 @@ from sqlalchemy.orm import load_only, joinedload, selectinload
 from sqlalchemy import and_
 from datetime import datetime
 from auth_token import *
+from uuid import uuid4
+from slugify import slugify
 
-db = Session()
+db = Session() 
+
+# create unique client slug from client name.
+def generate_client_slug(db, client_name):
+    counter = 1
+    client_id = models.Client.get_client_object(db).count()
+    base_slug = slugify(f"{client_name}-{client_id}")
+    slug = base_slug
+    while models.Client.check_slug(db, slug) is not None:
+        counter += 1
+        slug = f"{base_slug}{counter}"
+        
+    return slug
+
+# generate unique client key
+def generate_client_key(db):
+    client_key = str(uuid4())
+    # check if the key exists.
+    while models.Client.check_single_key(db, client_key) is not None:
+        client_key = str(uuid4())
+        
+    return client_key
+    
+    
 
 def create_new_client(db, client_details):
     # first check if the client is already present.
     try:
-        get_client = models.Client.check_single_key(db, client_details.client_key)
-        if get_client is not None:
-            return exceptions.bad_request_error("Opps!, Client already exists!")
-        # create the client
-        create_client = models.Client.create_single_client(db, 
-                                                        client_details.slug, client_details.client_key)
+        # get the slug.
+        client_slug = generate_client_slug(db, client_details.client_name)
+        # get the client key.
+        client_key = generate_client_key(db)
+        # convert the client_details to a dictionary.
+        client_data = client_details.dict(exclude_unset = True)
+        client_data['slug'] = client_slug
+        client_data['client_key'] = client_key
+        
+        create_client = models.Client.create_single_client(client_data)
         if create_client is None:
             return exceptions.bad_request_error("An error ocurred while creating client, Please try again")  
         
@@ -40,7 +69,7 @@ def create_new_client(db, client_details):
     except Exception as e:
         return exceptions.server_error(detail=str(e))  
 
-    return success_response.success_message([], "Client was successfully created", 201)
+    return success_response.success_message([{'slug':client_slug}], "Client was successfully created", 201)
     
 def update_client(db, client_id, update_client_data):
     try:

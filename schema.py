@@ -9,11 +9,11 @@ class BaseModel(PydanticBaseModel):
         orm_mode = True
 
 class ClientSchema(BaseModel):
-    slug: str
-    client_key: str   
+    client_name: str 
     
 class UpdateStatusSchema(BaseModel):
-    status: bool
+    client_name: str = None
+    status: bool = None
     
     @validator('status')
     def validate_status(cls, v):

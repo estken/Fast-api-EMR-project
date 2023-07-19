@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy.sql import text
 from .user_model import ClientUsers
 from .center_model import ClientCenter
+from .user_center_model import UserCenter
 import sys
 sys.path.append("..")
 
@@ -13,6 +14,7 @@ sys.path.append("..")
 class Client(Base):
     __tablename__ = "client"
     id = Column(Integer, primary_key=True, index=True)
+    client_name = Column(String(100), nullable=False)
     slug = Column(String(100), unique=True, nullable=False, index=True)
     client_key = Column(String(250), unique=True, nullable=False, index=True)
     status = Column(Boolean, default=True, nullable=False)
@@ -33,6 +35,11 @@ class Client(Base):
     @staticmethod
     def get_client_by_id(db: Session, id: int):
         return Client.get_client_object(db).get(id)
+    
+    @staticmethod
+    def check_slug(db: Session, slug: str):
+        return Client.get_client_object(db).filter_by(
+            slug = slug).first()
         
     # static method to check if the key exists
     @staticmethod
@@ -41,8 +48,8 @@ class Client(Base):
     
     # static method to create client.   
     @staticmethod
-    def create_single_client(db: Session, slug, client_key):
-        return Client(slug = slug, client_key = client_key)  
+    def create_single_client(client_data: dict):
+        return Client(**client_data)  
     
     @staticmethod
     def retrieve_all_client(db: Session):

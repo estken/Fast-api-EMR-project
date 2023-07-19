@@ -21,8 +21,8 @@ class UserCenter(Base):
                         onupdate=datetime.utcnow(), nullable=False)
     
     # relationships.
-    client_users = relationship('ClientUsers', backref='user_centers')
-    client_centers = relationship('ClientCenter', backref='user_centers')
+    client_users = relationship('ClientUsers', back_populates='user_centers')
+    client_centers = relationship('ClientCenter', back_populates='user_centers')
     
     # create the static methods
     @staticmethod

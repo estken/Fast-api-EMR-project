@@ -7,7 +7,6 @@ from sqlalchemy.sql import text
 import sys
 sys.path.append("..")
 
-
 class ClientUsers(Base):
     __tablename__ = 'client_users'
     id = Column(Integer, primary_key=True, index=True)
