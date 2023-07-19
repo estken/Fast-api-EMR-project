@@ -1,4 +1,4 @@
-# Notification Application
+# Access Control Application
 
 A Microservice Application for managing access and permissions across other microservices that makes up the complete HMS. It helps ensure that only authorized services or users can interact with specific microservices and perform the appropriate actions.
 
