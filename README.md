@@ -57,21 +57,12 @@ Follow these steps to set up the necessary environment variables:
 - Add the following variables and their corresponding values:
 
    ```plaintext
-   DB_ACCESS_HOST="server host name e.g localhost"
-   DB_ACCESS_USER="username e.g root"
-   DB_ACCESS_PASSWORD="enter your password"
-   DB_ACCESS_NAME="access_control_app"
-   TESTING=please leave this blank as it is required for testing.
-   ACCESS_PORT=port_number
-   RELOAD=True
-   HOST="application ip address e.g 127.0.0.1"
-   ACCESS_SECRET_KEY="anystring e.g an alphanumeric character combination advised"
-   REFRESH_SECRET_KEY="anystring e.g an alphanumeric character combination advised"
+   check the .envexample file for environment variables and corresponding values
    ```
 
 - Save it.
 
-6 Ensure you have your database server start up. 
+6 Ensure you have your database server start up.
 
 7 Create the database with name 'access_control_app'. you can do this manually or which ever way is convenient for you.
 

@@ -66,10 +66,15 @@ def create_new_client(db, client_details):
         db.add(create_client)
         db.commit()
         
+        result = {
+            'slug': client_slug,
+            'client_key' : client_key
+        }
+        
     except Exception as e:
         return exceptions.server_error(detail=str(e))  
 
-    return success_response.success_message([{'slug':client_slug}], "Client was successfully created", 201)
+    return success_response.success_message([result], "Client was successfully created", 201)
     
 def update_client(db, client_id, update_client_data):
     try:

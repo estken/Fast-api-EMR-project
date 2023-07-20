@@ -29,7 +29,7 @@ def seed_client(db: Session):
 def seed_client_prod(db: Session):
     from db.client_model import Client
     client_data = [
-        {'client_name': 'super admin', 'slug': 'intuitive','client_key': "intuitive_key"}
+        {'client_name': 'super admin', 'slug': 'intuitive','client_key': "837b9813-0a24-44d1-924c-0762ca05a8d2"}
     ]
     
     existing_clients = db.query(Client).filter(Client.slug.in_([client['slug'] for client in client_data])).all()
@@ -42,9 +42,9 @@ def seed_client_prod(db: Session):
 def seed_client_center(db: Session):
     from db.client_model import ClientCenter
     center_data = [
-        {'client_id':1, 'center': 'client 1'},
-        {'client_id': 1, 'center': 'client 2'},
-        {'client_id': 1, 'center': 'client 3'}
+        {'client_id':1, 'center': 'client 1', 'slug': 'center-1'},
+        {'client_id': 1, 'center': 'client 2', 'slug': 'center-2'},
+        {'client_id': 1, 'center': 'client 3', 'slug': 'center-3'}
     ]
     
     if ClientCenter.get_center_object(db).count() == 0:

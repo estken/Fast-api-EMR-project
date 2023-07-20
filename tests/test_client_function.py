@@ -30,7 +30,10 @@ def test_create_client(client_instance, get_session):
     # data to populate the table with.
     client_data = {
         'client_name': 'testing'
-    } 
+    }
+    # check the length of the table before insertion
+    retrieve_clients = models.Client.retrieve_all_client(get_session)
+    assert len(retrieve_clients) == 0
     # get the client router
     client_response = client_instance.post("/client/create", json=client_data)
     
