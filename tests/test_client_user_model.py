@@ -74,12 +74,3 @@ def test_update_client_user(get_session):
     assert get_user is not None
     assert get_user.admin == False
     assert get_user.username == "aa@gmail.com"
-    
-    
-    
-    
-    
-    
-    
-    
-    

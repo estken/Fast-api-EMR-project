@@ -7,7 +7,6 @@ from sqlalchemy.sql import text
 import sys
 sys.path.append("..")
 
-
 class ClientUsers(Base):
     __tablename__ = 'client_users'
     id = Column(Integer, primary_key=True, index=True)
@@ -27,6 +26,7 @@ class ClientUsers(Base):
                         onupdate=datetime.utcnow(), nullable=False)
     # relationships
     client = relationship("Client", back_populates="client_users")
+    user_centers = relationship("UserCenter", back_populates="client_users")
     
     # create static methods.
     @staticmethod

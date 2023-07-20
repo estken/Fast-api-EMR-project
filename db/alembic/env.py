@@ -11,6 +11,7 @@ from db.session import Base
 from db import client_model
 from db import user_model
 from db import center_model
+from db import user_center_model
 from db.connection import get_db_conn_string
 
 # this is the Alembic Config object, which provides

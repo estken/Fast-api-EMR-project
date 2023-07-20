@@ -18,7 +18,8 @@ def test_create_client_center(get_session):
     # set up the client center data
     center_data = {
         'client_id': 1,
-        'center': 'Center 1'
+        'center': 'Center 1',
+        'slug': 'center-1'
     }
     
     retrieve_centers = models.ClientCenter.get_all_center(get_session)
@@ -46,7 +47,7 @@ def test_update_client_center(get_session):
     # updated_data
     update_data = {
         'status': False,
-        'center': 'center 7'
+        'center': 'center 7',
     }
     # get the client center.
     get_center = models.ClientCenter.get_center_by_id(get_session, 1)
@@ -61,12 +62,3 @@ def test_update_client_center(get_session):
     get_center = models.ClientCenter.get_center_by_id(get_session, 1)
     assert get_center.status == False
     assert get_center.center == 'center 7'
-    
-    
-    
-    
-    
-    
-    
-    
-    

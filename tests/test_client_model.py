@@ -8,6 +8,7 @@ import uuid
 def test_client_model(get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': str(uuid.uuid4())
     } 
@@ -15,8 +16,7 @@ def test_client_model(get_session):
     retrieve_clients = models.Client.retrieve_all_client(get_session)
     assert len(retrieve_clients) == 0
     # create a client (CREATE AND RETRIEVE)
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -29,6 +29,7 @@ def test_client_model(get_session):
 def test_add_client(get_session):
     # data to populate the table with.
     client_data = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': str(uuid.uuid4())
     } 
@@ -37,8 +38,7 @@ def test_add_client(get_session):
     assert len(retrieve_clients) == 0
     
     # add the data.
-    client = ClientSchema(**client_data)
-    created_client = models.Client(slug=client.slug, client_key=client.client_key)
+    created_client = models.Client(**client_data)
     get_session.add(created_client)
     get_session.commit()
     
@@ -47,21 +47,22 @@ def test_add_client(get_session):
     assert len(retrieve_all_records) == 1
     
     # get the client details, and also check that the attributes inserted has proper values.
-    get_details = models.Client.check_single_key(get_session, client.client_key)
-    assert get_details.slug == client.slug
-    assert get_details.client_key == client.client_key
+    get_details = models.Client.check_single_key(get_session, client_data['client_key'])
+    assert get_details.slug == client_data['slug']
+    assert get_details.client_key == client_data['client_key']
+    assert get_details.client_name == client_data['client_name']
     assert get_details.status == True
     assert get_details.created_at is not None
     assert get_details.updated_at is not None
 
 def test_client_key_exists(get_session):
     client_data_1 = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': str(uuid.uuid4())
     }
     
-    client_1 = ClientSchema(**client_data_1)
-    created_client_1 = models.Client.create_single_client(get_session, client_1.slug, client_1.client_key)
+    created_client_1 = models.Client.create_single_client(client_data_1)
     get_session.add(created_client_1)
     get_session.commit()
       
@@ -70,7 +71,7 @@ def test_client_key_exists(get_session):
     assert len(retrieve_client) == 1
     
     # check if the key exsts
-    check_key = models.Client.check_single_key(get_session, client_1.client_key)
+    check_key = models.Client.check_single_key(get_session, client_data_1['client_key'])
     assert check_key is not None
     
     
@@ -85,18 +86,18 @@ def test_client_key_not_exists(get_session):
 
 def test_update_client_status(get_session):
     client_data_1 = {
+        'client_name': 'testing',
         'slug': 'client-A',
         'client_key': str(uuid.uuid4())
     }
     
-    client_1 = ClientSchema(**client_data_1)
-    created_client_1 = models.Client.create_single_client(get_session, client_1.slug, client_1.client_key)
+    created_client_1 = models.Client.create_single_client(client_data_1)
     get_session.add(created_client_1)
     get_session.commit()
     
-    get_details = models.Client.check_single_key(get_session, client_1.client_key)
-    assert get_details.slug == client_1.slug
-    assert get_details.client_key == client_1.client_key
+    get_details = models.Client.check_single_key(get_session, client_data_1['client_key'])
+    assert get_details.slug == client_data_1['slug']
+    assert get_details.client_key == client_data_1['client_key']
     assert get_details.status == True
     
     # update the status
@@ -111,7 +112,7 @@ def test_update_client_status(get_session):
     get_session.refresh(updated_client)
     
     # check that the client is updated to False
-    get_details = models.Client.check_single_key(get_session, client_1.client_key)
-    assert get_details.slug == client_1.slug
-    assert get_details.client_key == client_1.client_key
+    get_details = models.Client.check_single_key(get_session, client_data_1['client_key'])
+    assert get_details.slug == client_data_1['slug']
+    assert get_details.client_key == client_data_1['client_key']
     assert get_details.status == False

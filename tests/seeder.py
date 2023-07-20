@@ -7,18 +7,18 @@ from argon2 import PasswordHasher #password hashing mechanism.
 def seed_client(db: Session):
     from db.client_model import Client
     client_data = [
-        {'slug': 'client-f','client_key': "new_key"},
-        {'slug': 'client-a','client_key': "new_key2"},
-        {'slug': 'client-b','client_key': "new_key3"},
-        {'slug': 'client-c','client_key': "new_key4"},
-        {'slug': 'client-d','client_key': "new_key5"},
-        {'slug': 'client-e','client_key': "new_key6"},
-        {'slug': 'client-g','client_key': "new_key7"},
-        {'slug': 'client-h','client_key': "new_key8"},
-        {'slug': 'client-i','client_key': "new_key9"},
-        {'slug': 'client-j','client_key': "new_key10"},
-        {'slug': 'client-k','client_key': "new_key11"},
-        {'slug': 'client-l','client_key': "new_key12"}
+        {'client_name': 'test1', 'slug': 'client-f','client_key': "new_key"},
+        {'client_name': 'test1', 'slug': 'client-a','client_key': "new_key2"},
+        {'client_name': 'test1', 'slug': 'client-b','client_key': "new_key3"},
+        {'client_name': 'test1', 'slug': 'client-c','client_key': "new_key4"},
+        {'client_name': 'test1', 'slug': 'client-d','client_key': "new_key5"},
+        {'client_name': 'test1', 'slug': 'client-e','client_key': "new_key6"},
+        {'client_name': 'test1', 'slug': 'client-g','client_key': "new_key7"},
+        {'client_name': 'test1', 'slug': 'client-h','client_key': "new_key8"},
+        {'client_name': 'test1', 'slug': 'client-i','client_key': "new_key9"},
+        {'client_name': 'test1', 'slug': 'client-j','client_key': "new_key10"},
+        {'client_name': 'test1', 'slug': 'client-k','client_key': "new_key11"},
+        {'client_name': 'test1', 'slug': 'client-l','client_key': "new_key12"}
     ]
     
     if Client.get_client_object(db).count() == 0:
@@ -29,7 +29,7 @@ def seed_client(db: Session):
 def seed_client_prod(db: Session):
     from db.client_model import Client
     client_data = [
-        {'slug': 'intuitive','client_key': "intuitive_key"}
+        {'client_name': 'super admin', 'slug': 'intuitive','client_key': "837b9813-0a24-44d1-924c-0762ca05a8d2"}
     ]
     
     existing_clients = db.query(Client).filter(Client.slug.in_([client['slug'] for client in client_data])).all()
@@ -42,9 +42,9 @@ def seed_client_prod(db: Session):
 def seed_client_center(db: Session):
     from db.client_model import ClientCenter
     center_data = [
-        {'client_id':1, 'center': 'client 1'},
-        {'client_id': 1, 'center': 'client 2'},
-        {'client_id': 1, 'center': 'client 3'}
+        {'client_id':1, 'center': 'client 1', 'slug': 'center-1'},
+        {'client_id': 1, 'center': 'client 2', 'slug': 'center-2'},
+        {'client_id': 1, 'center': 'client 3', 'slug': 'center-3'}
     ]
     
     if ClientCenter.get_center_object(db).count() == 0:

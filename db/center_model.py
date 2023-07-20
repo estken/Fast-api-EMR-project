@@ -24,6 +24,7 @@ class ClientCenter(Base):
                         onupdate=datetime.utcnow(), nullable=False)
     # relationship part.
     client = relationship('Client', back_populates="client_centers")
+    user_centers = relationship('UserCenter', back_populates="client_centers")
         
     @staticmethod
     def get_center_object(db: Session):
