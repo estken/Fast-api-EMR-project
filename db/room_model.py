@@ -29,11 +29,11 @@ class ClientRoom(Base):
     
     @staticmethod
     def get_first_room(session: Session, center_id: int, room: str):
-        return session.query(ClientRoom).filter(ClientRoom.center_id == center_id, ClientRoom.slug == room)
+        return session.query(ClientRoom).filter(ClientRoom.center_id == center_id, ClientRoom.slug == room).first()
     
     @staticmethod
     def get_center_rooms(session: Session, center_id: int):
-        return session.query(ClientRoom).filter(ClientRoom.center_id).all()
+        return session.query(ClientRoom).filter(ClientRoom.center_id == center_id).all()
     
     @staticmethod
     def get_center_rooms_by_status(session: Session, center_id: int, status: int):
