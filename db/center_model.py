@@ -25,7 +25,7 @@ class ClientCenter(Base):
     # relationship part.
     client = relationship('Client', back_populates="client_centers")
     user_centers = relationship('UserCenter', back_populates="client_centers")
-    room = relationship('ClientRoom', backref="client_center")
+    rooms = relationship('ClientRoom', back_populates="room")
         
     @staticmethod
     def get_center_object(db: Session):
