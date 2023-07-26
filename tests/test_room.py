@@ -1,6 +1,8 @@
-from .conftest import get_session
+from .conftest import get_session, admin_login
 from db.room_model import ClientRoom
+from db.equipment_model import ClientEquipment
 from .seeder import seed_client, seed_client_center
+from schemas.room_schema import EquipmentCreateBase
 
 def get_first_room_by_name(get_session, center_id: int, room: str):
         return get_session.query(ClientRoom).filter(ClientRoom.center_id == center_id, ClientRoom.name == room).first()
@@ -65,3 +67,20 @@ def test_get_all_center_rooms_by_status(get_session):
     assert len(rooms) == 2
     for data in rooms:
          assert data.name !='room_5'
+
+def test_create_equipment_endpoint(get_session, client_instance, client_header, admin_details):
+     get_session.query(ClientEquipment).delete()
+     token = admin_login(get_session, client_instance, client_header, admin_details)
+     print(token)
+     gadget_data = {
+        'equipment': "test equipment"
+    }
+     equip = get_session.query(ClientEquipment).all()
+     assert len(equip) == 0
+     response = client_instance.post("/equipment/create", headers={"Authorization": f"Bearer {token}"}, json= gadget_data)
+     assert response.status_code == 201
+     equipment = get_session.query(ClientEquipment).all()
+     assert len(equipment) == 1
+     first = get_session.query(ClientEquipment).first()
+     assert first.equipment == "test equipment"
+     assert first.slug is not None

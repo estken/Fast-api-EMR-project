@@ -22,7 +22,7 @@ class ClientRoom(Base):
     updated_at = Column(TIMESTAMP(timezone=True),
                         default=datetime.utcnow(), 
                         onupdate=datetime.utcnow(), nullable=False)
-    room = relationship('ClientCenter', back_populates="rooms")
+    center = relationship('ClientCenter', back_populates="rooms")
 
     @staticmethod
     def insert_room(session: Session, insert_data):

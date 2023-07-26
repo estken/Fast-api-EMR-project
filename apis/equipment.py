@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
-from dataclasses import asdict
 import sys, asyncio
 sys.path.append("..")
 from db.session import get_db
 from schemas.room_schema import EquipmentCreateBase, EquipmentNameBase, EquipmentSlugBase
-from crud.room_crud import create_client_equipment, update_client_equipment, get_single_equipment, list_client_equipment, delete_single_equipment
+from crud.room_crud import create_client_equipment, update_client_equipment, get_single_equipment, list_client_equipment, delete_client_equipment
 from auth import validate_active_client
 
 
@@ -39,4 +38,4 @@ async def view_all(current_user : dict = Depends(validate_active_client),
 @equipment_router.delete('/delete', summary="View single equipment", status_code=200)
 async def deleteequipment(gadget: EquipmentSlugBase, current_user_dict : dict = Depends(validate_active_client), 
                       db: Session = Depends(get_db)):
-    return delete_single_equipment(db, gadget)
+    return delete_client_equipment(db, gadget)

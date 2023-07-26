@@ -9,7 +9,7 @@ def create_client_equipment(db, equipment: EquipmentCreateBase):
         gadget = ClientEquipment.lookup_eqipment_by_name(db, equipment.equipment)
         if gadget:
             return exceptions.bad_request_error(f"equipment {equipment.equipment} already exists")
-        ClientEquipment.insert_equipment(db, equipment)
+        ClientEquipment.insert_equipment(db, equipment.__dict__)
         db.commit()
         return success_response.success_message([], f"Equipment {equipment.equipment} was successfully created", 201)
     except Exception as e:
@@ -27,7 +27,7 @@ def update_client_equipment(db, equipment: EquipmentNameBase):
     except Exception as e:
         return exceptions.server_error(detail=str(e))
 
-#TODO: delete all rooms equipment assigned to
+# remeber to delete all rooms equipment assigned to
 def delete_client_equipment(db, data: EquipmentSlugBase):
     try:
         gadget = ClientEquipment.lookup_eqipment_by_slug(db, data.slug)
