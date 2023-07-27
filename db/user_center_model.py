@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy.sql import text
 import sys
+import random
 sys.path.append("..")
 
 class UserCenter(Base):
@@ -34,17 +35,22 @@ class UserCenter(Base):
         return UserCenter(**user_center_data)
     
     @staticmethod
-    def get_user_center_by_id(user_center_id: int):
+    def bulk_create(center_ids, user_id, selected_center):
+        return [UserCenter(user_id=user_id, center_id=center_id, is_default=(center_id == selected_center))
+                for center_id in center_ids]
+            
+    @staticmethod
+    def get_user_center_by_id(db, user_center_id: int):
         return UserCenter.user_center_object(db).get(user_center_id)
     
     @staticmethod
-    def get_user_centers(user_id: int, client_id: int):
+    def get_user_centers(db, user_id: int):
         return UserCenter.user_center_object(db).filter_by(
-            user_id=user_id, client_id=client_id).all()
+            user_id=user_id).all()
         
     @staticmethod
-    def update_user_center(user_center_id: int, user_center_data: dict):
-        user_center = UserCenter.get_user_center_by_id(user_center_id)
+    def update_user_center(db, user_center_id: int, user_center_data: dict):
+        user_center = UserCenter.get_user_center_by_id(db, user_center_id)
         for key, value in user_center_data.items():
             setattr(user_center, key, value) 
         return user_center

@@ -23,9 +23,30 @@ from utils import (
     remove_fields,
     model_to_dict
 )
+import random
 
 db = Session()
 hasher = PasswordHasher()
+
+def check_centers(db, center_list, client_id):
+    error_message = ""
+    centers_ids = []
+    check_all = True
+    center_list = [center_name.lower() for center_name in center_list]
+    
+    existing_centers = models.ClientCenter.get_center_object(
+        db).filter(models.ClientCenter.client_id == client_id, 
+                    models.ClientCenter.slug.in_(center_list)).all()
+    
+    # Create a dictionary to store center names as keys and IDs as values
+    center_name = {center.slug: center.id for center in existing_centers}
+    # get the missing centers, that's the supplied centers that are not valid.
+    missing_centers = set(center_list) - set(center_name.keys())
+    if len(missing_centers) != 0:
+        check_all = False
+        error_message = "The following centers don't exist: " + ", ".join(list(missing_centers))
+    
+    return check_all, error_message, list(center_name.values())
 
 def filter_fields(user: models.ClientUsers, fields: list):
     filtered_data = model_to_dict(user.__dict__)
@@ -93,13 +114,18 @@ def user_login(db, client_id, username, password):
 # create new user.
 def create_user(db, user_payload, new_user):
     try:
-        # get the current_user from the user payload.
+            # get the current_user from the user payload.
         selected_client_id = user_payload.get("selected_client_id")
         current_user = get_active_user(db, user_payload)
         # check if the username exist.
         check_client = models.ClientUsers.check_client_username(db, selected_client_id, new_user.username.lower())
         if check_client is not None:
             return exceptions.bad_request_error(f"user with username {new_user.username.lower()} already exists")
+        # check if the center(s) exists.
+        bool_result, err_mess, center_ids = check_centers(db, new_user.center, selected_client_id)
+        if not bool_result:
+            return exceptions.bad_request_error(err_mess)
+                
         # create the user
         new_user_dict = new_user.dict(exclude_unset = True)
         new_user_dict['client_id'] = selected_client_id
@@ -111,16 +137,29 @@ def create_user(db, user_payload, new_user):
             
         new_user_dict['password'] = hasher.hash(password)
         new_user_dict['username'] = new_user_dict['username'].lower()
+        # remove center from the dictionary since it's not a valid field in the model.
+        new_user_dict.pop('center')
         create_new_user = models.ClientUsers.create_client_users(new_user_dict)
         if create_new_user is None:
+            db.rollback()
             return exceptions.bad_request_error("Error occurred while creating user")
         # add and commit
         db.add(create_new_user)
+        
+        #create the user and center.
+        user_center = models.UserCenter.bulk_create(center_ids, create_new_user.id,
+                                                    random.choice(center_ids))
+        if not user_center:
+            db.rollback()
+            return exceptions.bad_request_error("An error occurred when trying to map user to centers, please try again.") 
+        
+        db.add_all(user_center)
         db.commit()
         
         return success_response.success_message([], "New User was successfully created", 201)
 
     except Exception as e:
+        db.rollback()
         return exceptions.server_error(detail=str(e))
     
 
@@ -191,4 +230,3 @@ def update_details(db, username, user_payload, update_data):
     
     except Exception as e:
         return exceptions.server_error(detail=str(e))
-    

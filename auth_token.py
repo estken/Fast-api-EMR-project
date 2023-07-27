@@ -7,7 +7,7 @@ from response_handler import error_response
 
 ACCESS_SECRET_KEY = os.getenv('ACCESS_SECRET_KEY')
 REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')
-ACCESS_TOKEN_EXPIRE_MINUTES = 10
+ACCESS_TOKEN_EXPIRE_MINUTES = 1000
 REFRESH_TOKEN_EXPIRE_MINUTES = 30
 
 def create_token(users: ClientUsers, center_id = 0, selected_client_id=0):
@@ -17,11 +17,11 @@ def create_token(users: ClientUsers, center_id = 0, selected_client_id=0):
     refresh_token = create_refresh_token(users, center_id, selected_client_id)
     # todo: generate the page_slug, as well as permission for each users.
     
-    return [{
+    return {
         "access_token": access_token,
         "refresh_token": refresh_token,
         "token_type": "bearer",
-    }]        
+    }        
 
 def create_access_token(users: ClientUsers, center_id, selected_client_id):
     # Set the expiration time for the access token.

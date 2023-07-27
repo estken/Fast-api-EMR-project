@@ -88,7 +88,11 @@ python3 main.py
 
 or 
 
-pytest (for testing)
+pytest (for testing all test files)
+
+or 
+
+pytest tests/test_filename.py (for testing a single test file)
 ```
 
 ## Features

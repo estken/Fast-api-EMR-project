@@ -44,7 +44,7 @@ class ClientCenter(Base):
     def create_center(center_data: dict):
         return ClientCenter(**center_data)
     
-    @staticmethod
+    @staticmethod 
     def get_all_client_center(db: Session, client_id: int):
         return ClientCenter.get_center_object(db).filter_by(client_id = client_id).all()
     
