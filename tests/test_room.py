@@ -1,4 +1,4 @@
-from .conftest import get_session, admin_login
+from .conftest import get_session, admin_login, client_instance
 from db.room_model import ClientRoom
 from db.equipment_model import ClientEquipment
 from .seeder import seed_client, seed_client_center
@@ -68,9 +68,9 @@ def test_get_all_center_rooms_by_status(get_session):
     for data in rooms:
          assert data.name !='room_5'
 
-def test_create_equipment_endpoint(get_session, client_instance, client_header, admin_details):
+def test_create_equipment_endpoint(get_session, client_instance, admin_login):
     get_session.query(ClientEquipment).delete()
-    token = admin_login(get_session, client_instance, client_header, admin_details)
+    token = admin_login['access_token']
     gadget_data = {
         'equipment': "test equipment"
     }
@@ -84,9 +84,9 @@ def test_create_equipment_endpoint(get_session, client_instance, client_header, 
     assert first.equipment == "test equipment"
     assert first.slug is not None
 
-def test_create_equipment_duplicate_endpoint(get_session, client_instance, client_header, admin_details):
+def test_create_equipment_duplicate_endpoint(get_session, client_instance, admin_login):
     get_session.query(ClientEquipment).delete()
-    token = admin_login(get_session, client_instance, client_header, admin_details)
+    token = admin_login['access_token']
     gadget_data = {
         'equipment': "test equipment"
     }
@@ -100,7 +100,7 @@ def test_create_equipment_duplicate_endpoint(get_session, client_instance, clien
     assert response.json()['detail'] == "equipment test equipment already exists"
     assert response.json()['status'] == 0
 
-def test_update_equipment_endpoint(get_session, client_instance, client_header, admin_details):
+def test_update_equipment_endpoint(get_session, client_instance, admin_login):
     get_session.query(ClientEquipment).delete()
     gadget_data2 = {
         'equipment': "test equipment2",
@@ -111,27 +111,28 @@ def test_update_equipment_endpoint(get_session, client_instance, client_header, 
     get_session.commit()
     equip = get_session.query(ClientEquipment).filter(ClientEquipment.slug=="test_slug").first()
     assert equip.equipment == "test equipment"
-    token = admin_login(get_session, client_instance, client_header, admin_details)
+    token = admin_login['access_token']
     response = client_instance.patch("/equipment/update", headers={"Authorization": f"Bearer {token}"}, json= gadget_data2)
+    get_session.commit()
     assert response.status_code == 200
     assert response.json()['detail'] == "Equipment name changed to test equipment2"
     assert response.json()['status'] == 1
     equip2 = get_session.query(ClientEquipment).filter(ClientEquipment.slug=="test_slug").first()
     assert equip2.equipment == "test equipment2"
 
-def test_lookup_single_equipment(get_session, client_instance, client_header, admin_details):
+def test_lookup_single_equipment(get_session, client_instance, admin_login):
     get_session.query(ClientEquipment).delete()
     equipment_1 = ClientEquipment(equipment ="test equipment", slug="test_slug")
     get_session.add(equipment_1)
     get_session.commit()
     equip = get_session.query(ClientEquipment).filter(ClientEquipment.slug=="test_slug").first()
     assert equip.equipment == "test equipment"
-    token = admin_login(get_session, client_instance, client_header, admin_details)
+    token = admin_login['access_token']
     response = client_instance.get("/equipment/view/test_slug", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json()['data']['equipment'] == "test equipment"
 
-def test_list_all_equipment(get_session, client_instance, client_header, admin_details):
+def test_list_all_equipment(get_session, client_instance, admin_login):
     get_session.query(ClientEquipment).delete()
     equipment_1 = ClientEquipment(equipment ="test equipment", slug="test_slug")
     get_session.add(equipment_1)
@@ -140,7 +141,7 @@ def test_list_all_equipment(get_session, client_instance, client_header, admin_d
     get_session.commit()
     equip = get_session.query(ClientEquipment).all()
     assert len(equip) == 2
-    token = admin_login(get_session, client_instance, client_header, admin_details)
+    token = admin_login['access_token']
     response = client_instance.get("/equipment", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     data = response.json()['data']
@@ -148,7 +149,7 @@ def test_list_all_equipment(get_session, client_instance, client_header, admin_d
          assert gadget['equipment'] == "test equipment" or gadget['equipment'] == "test equipment2"
          assert gadget['slug'] == "test_slug" or gadget['slug'] == "test_slug2"
 
-def test_delete_single_equipment(get_session, client_instance, client_header, admin_details):
+def test_delete_single_equipment(get_session, client_instance, admin_login):
     get_session.query(ClientEquipment).delete()
     equipment_1 = ClientEquipment(equipment ="test equipment", slug="test_slug")
     get_session.add(equipment_1)
@@ -157,7 +158,7 @@ def test_delete_single_equipment(get_session, client_instance, client_header, ad
     get_session.commit()
     equip = get_session.query(ClientEquipment).all()
     assert len(equip) == 2
-    token = admin_login(get_session, client_instance, client_header, admin_details)
+    token = admin_login['access_token']
     response = client_instance.delete("/equipment/delete/test_slug", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json()['detail'] == "Equipment test equipment delete successfully"

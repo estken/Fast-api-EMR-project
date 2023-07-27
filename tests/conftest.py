@@ -46,10 +46,12 @@ def admin_details():
 def client_header():
     return {'Client-Authorization': 'new_key'}
 
+
+@pytest.fixture(scope='function')
 def admin_login(get_session, client_instance, client_header, admin_details):
     from .seeder import seed_client, seed_client_users
     seed_client(get_session)
     seed_client_users(get_session)
-    response = client_instance.post("/user/login", headers= client_header, data=admin_details)
-    token = response.json()['data']['access_token']
+    response = client_instance.post("/user/login", headers=client_header, data=admin_details)
+    token = response.json()['data']
     return token

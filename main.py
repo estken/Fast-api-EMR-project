@@ -87,8 +87,9 @@ access_control_app.include_router(
 @access_control_app.on_event("startup")
 async def startup_event():
     db = Session()
-    # seed_client_prod(db)
-    # seed_client_user_prod(db)
+    if not os.environ['TESTING']:
+        seed_client_prod(db)
+        seed_client_user_prod(db)
     db.close()
     
     
