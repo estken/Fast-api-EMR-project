@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import sys, asyncio
 sys.path.append("..")
@@ -23,7 +23,7 @@ async def update_user(gadget: EquipmentNameBase, current_user_dict : dict = Depe
                       db: Session = Depends(get_db)):
     return update_client_equipment(db, gadget)
 
-@equipment_router.get('view/{slug}', summary="View single equipment", status_code=200)
+@equipment_router.get('/view/{slug}', summary="View single equipment", status_code=200)
 async def view_single_quipment(slug: str, current_user : dict = Depends(validate_active_client), 
                       db: Session = Depends(get_db)):
     gadget_dict = {'slug': slug } 
@@ -35,7 +35,9 @@ async def view_all(current_user : dict = Depends(validate_active_client),
                       db: Session = Depends(get_db)):
     return list_client_equipment(db)
 
-@equipment_router.delete('/delete', summary="View single equipment", status_code=200)
-async def deleteequipment(gadget: EquipmentSlugBase, current_user_dict : dict = Depends(validate_active_client), 
+@equipment_router.delete('/delete/{slug}', summary="View single equipment", status_code=200)
+async def delete_equipment(slug: str, current_user_dict : dict = Depends(validate_active_client), 
                       db: Session = Depends(get_db)):
-    return delete_client_equipment(db, gadget)
+    gadget_dict = {'slug': slug } 
+    client_gadget = EquipmentSlugBase(**gadget_dict)
+    return delete_client_equipment(db, client_gadget)

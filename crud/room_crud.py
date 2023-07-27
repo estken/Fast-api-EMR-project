@@ -21,9 +21,10 @@ def update_client_equipment(db, equipment: EquipmentNameBase):
         gadget = ClientEquipment.lookup_eqipment_by_slug(db, equipment.slug)
         if gadget is None:
             return exceptions.bad_request_error("Equipment not found")
-        gadget.equipment = EquipmentNameBase.equipment
+        gadget.equipment = equipment.equipment
         db.add(gadget)
         db.commit()
+        return success_response.success_message([], f"Equipment name changed to {equipment.equipment}", 200)
     except Exception as e:
         return exceptions.server_error(detail=str(e))
 
@@ -37,7 +38,7 @@ def delete_client_equipment(db, data: EquipmentSlugBase):
         db.delete(gadget)
         db.commit()
 
-        return success_response.success_message(gadget_data, "Equipment delete successfully", 201)
+        return success_response.success_message(gadget_data, f"Equipment {gadget.equipment} delete successfully", 200)
     except Exception as e:
         return exceptions.server_error(detail=str(e))
     
