@@ -6,7 +6,9 @@ from datetime import datetime
 from sqlalchemy.sql import text
 from .user_model import ClientUsers
 from .center_model import ClientCenter
+from .equipment_model import ClientEquipment
 from .user_center_model import UserCenter
+from .room_model import ClientRoom
 import sys
 sys.path.append("..")
 
@@ -25,7 +27,7 @@ class Client(Base):
                         onupdate=datetime.utcnow(), nullable=False)    
     # relationship
     client_users = relationship("ClientUsers", back_populates="client")
-    client_centers = relationship("ClientCenter", back_populates="client")
+    
     # get the client object
     @staticmethod
     def get_client_object(db: Session):

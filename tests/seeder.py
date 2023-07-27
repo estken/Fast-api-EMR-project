@@ -42,9 +42,9 @@ def seed_client_prod(db: Session):
 def seed_client_center(db: Session):
     from db.client_model import ClientCenter
     center_data = [
-        {'client_id':1, 'center': 'client 1', 'slug': 'center-1'},
-        {'client_id': 1, 'center': 'client 2', 'slug': 'center-2'},
-        {'client_id': 1, 'center': 'client 3', 'slug': 'center-3'}
+        {'center': 'client 1', 'slug': 'center-1'},
+        {'center': 'client 2', 'slug': 'center-2'},
+        {'center': 'client 3', 'slug': 'center-3'}
     ]
     
     if ClientCenter.get_center_object(db).count() == 0:
@@ -73,7 +73,7 @@ def seed_client_users(db: Session):
 def seed_client_user_prod(db: Session):
     from db.client_model import ClientUsers
     client_user_data = [
-        {'client_id':1, 'username': 'admin@intuitive.com', 'password': 'Qwerty123@', 'admin': True}
+        {'client_id':1, 'username': 'admin@intuitiveghs.com', 'password': 'Qwerty123@', 'admin': True}
     ]
     
     if ClientUsers.client_user_object(db).count() == 0:

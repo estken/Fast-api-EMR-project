@@ -26,6 +26,9 @@ dist/
 # JetBrains IDE
 .idea/
 
+# JetBrains IDE
+venv/
+
 # Unit test reports
 TEST*.xml
 

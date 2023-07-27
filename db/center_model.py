@@ -13,7 +13,6 @@ db = sess()
 class ClientCenter(Base):
     __tablename__="client_center"
     id = Column(Integer, primary_key=True, index= True)
-    client_id = Column(Integer, ForeignKey("client.id"), nullable=False)
     center = Column(String(100), nullable = False)
     slug = Column(String(100), nullable = False, unique=True)
     status = Column(Boolean, default= True)
@@ -23,8 +22,8 @@ class ClientCenter(Base):
                         default=datetime.utcnow(), 
                         onupdate=datetime.utcnow(), nullable=False)
     # relationship part.
-    client = relationship('Client', back_populates="client_centers")
     user_centers = relationship('UserCenter', back_populates="client_centers")
+    rooms = relationship('ClientRoom', back_populates="center")
         
     @staticmethod
     def get_center_object(db: Session):
@@ -45,8 +44,8 @@ class ClientCenter(Base):
         return ClientCenter(**center_data)
     
     @staticmethod 
-    def get_all_client_center(db: Session, client_id: int):
-        return ClientCenter.get_center_object(db).filter_by(client_id = client_id).all()
+    def get_all_active_center(db: Session, status):
+        return ClientCenter.get_center_object(db).filter_by(status = status).all()
     
     @staticmethod
     def get_all_center(db: Session):

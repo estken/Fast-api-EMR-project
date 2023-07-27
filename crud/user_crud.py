@@ -35,8 +35,7 @@ def check_centers(db, center_list, client_id):
     center_list = [center_name.lower() for center_name in center_list]
     
     existing_centers = models.ClientCenter.get_center_object(
-        db).filter(models.ClientCenter.client_id == client_id, 
-                    models.ClientCenter.slug.in_(center_list)).all()
+        db).filter(models.ClientCenter.slug.in_(center_list)).all()
     
     # Create a dictionary to store center names as keys and IDs as values
     center_name = {center.slug: center.id for center in existing_centers}

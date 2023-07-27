@@ -40,7 +40,6 @@ def create_center(db, user_payload, center_detail):
         selected_client_id = user_payload.get("selected_client_id") 
         # convert the center_detail to dictionary
         center_data = center_detail.dict(exclude_unset = True)
-        center_data['client_id'] = selected_client_id
         center_data['slug'] = generate_slug(db, get_user, center_detail.center)
         # create the center for the client.
         created_center = models.ClientCenter.create_center(
@@ -62,9 +61,6 @@ def update_center(db, user_payload, update_center_data, center_slug):
         check_center = models.ClientCenter.check_slug(db, center_slug)
         if check_center is None:
             return exceptions.bad_request_error("Sorry Center does not exists")
-        # check if the client id doesn't tally with the center_id client
-        if check_center.client_id != user_payload.get("client_id"):
-            return exceptions.bad_request_error("Center doesn't belong to Client")
         # get the center id.
         center_id = check_center.id
         # update right away.
@@ -88,10 +84,7 @@ def update_center_status(db, user_payload, center_slug, state):
         check_center = models.ClientCenter.check_slug(db, center_slug.slug)
         if check_center is None:
             return exceptions.bad_request_error("Sorry Center does not exists")
-        # check if the client id doesn't tally with the center_id client
-        if check_center.client_id != user_payload.get("client_id"):
-            return exceptions.bad_request_error("Center doesn't belong to Client")
-        
+            
         if state == check_center.status:
             if state:
                 return exceptions.bad_request_error("Center is already Enabled")
@@ -119,10 +112,7 @@ def get_center(db, user_payload, center_slug):
         check_center = models.ClientCenter.check_slug(db, center_slug)
         if check_center is None:
             return exceptions.bad_request_error("Sorry Center does not exists")
-        # check if the client id doesn't tally with the center_id client
-        if check_center.client_id != user_payload.get("client_id"):
-            return exceptions.bad_request_error("Center doesn't belong to Client")
-
+        
         return success_response.success_message(check_center)
     
     except Exception as e:
@@ -132,7 +122,7 @@ def get_centers(db, user_payload):
     try:
         # get the user payload for the centers.
         selected_client_id = user_payload.get("selected_client_id")
-        centers = models.ClientCenter.get_all_client_center(db, selected_client_id)
+        centers = models.ClientCenter.get_all_center(db)
         
         return success_response.success_message(centers)
         
