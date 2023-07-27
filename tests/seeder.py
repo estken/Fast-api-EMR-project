@@ -73,7 +73,7 @@ def seed_client_users(db: Session):
 def seed_client_user_prod(db: Session):
     from db.client_model import ClientUsers
     client_user_data = [
-        {'client_id':1, 'username': 'admin@intuitive.com', 'password': 'Qwerty123@', 'admin': True}
+        {'client_id':1, 'username': 'admin@intuitiveghs.com', 'password': 'Qwerty123@', 'admin': True}
     ]
     
     if ClientUsers.client_user_object(db).count() == 0:
