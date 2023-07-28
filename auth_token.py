@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from jose import jwt
 from db.user_model import ClientUsers
 import os
-from response_handler import error_response
 
 ACCESS_SECRET_KEY = os.getenv('ACCESS_SECRET_KEY')
 REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')

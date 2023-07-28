@@ -10,7 +10,7 @@ from auth import validate_active_client
 
 equipment_router = APIRouter(
     prefix="/equipment",
-    tags=["Equipment","Room"],
+    tags=["Equipment Room"],
 )
 
 @equipment_router.post("/create", summary="Create client equipment", status_code=201)

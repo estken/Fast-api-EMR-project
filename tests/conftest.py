@@ -1,10 +1,8 @@
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import sys
-from sqlalchemy.orm import sessionmaker
 sys.path.append("..")
-from db.session import engine, Base, get_db
+from db.session import engine, Base
 from db.session import Session as sess
 from main import access_control_app 
 # the scope = 'session' is called once when the test is runned accross all files.
@@ -46,10 +44,12 @@ def admin_details():
 def client_header():
     return {'Client-Authorization': 'new_key'}
 
+
+@pytest.fixture(scope='function')
 def admin_login(get_session, client_instance, client_header, admin_details):
     from .seeder import seed_client, seed_client_users
     seed_client(get_session)
     seed_client_users(get_session)
-    response = client_instance.post("/user/login", headers= client_header, data=admin_details)
-    token = response.json()['data']['access_token']
+    response = client_instance.post("/user/login", headers=client_header, data=admin_details)
+    token = response.json()['data']
     return token

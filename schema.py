@@ -34,6 +34,7 @@ class ClientUserSchema(BaseModel):
     username: str
     password: str = Field(min_length=8)
     admin: bool = False
+    center: List[str]
     
     @validator('admin')
     def validate_admin(cls, v):
@@ -70,3 +71,16 @@ class ClientCenterSchema(BaseModel):
     
 class ClientCenterSlugSchema(BaseModel):
     slug: str
+
+class UserSchema(BaseModel):
+    username: str # to be replaced wuth UUID.
+    
+class UserCenterSchema(BaseModel):
+    username: str # to be replaced with UUID.
+    center: List[str]
+    
+class UserDefaultSchema(BaseModel):
+    username: str # to be replaced with UUID.
+    center: str
+
+    

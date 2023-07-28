@@ -1,23 +1,14 @@
 import sys
-
-from fastapi import HTTPException
-# from sqlalchemy.orm import Session, load_only
-
 sys.path.append("..")
 from utils import *
-from typing import List
 from db import client_model as models
 from db.session import Session
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-from fastapi_pagination import Page, Params
+from fastapi_pagination import Params
 from response_handler import error_response as exceptions
 from response_handler import success_response
 from fastapi_pagination.ext.sqlalchemy import paginate
 
-from sqlalchemy.orm import load_only, joinedload, selectinload
-from sqlalchemy import and_
-from datetime import datetime
+from sqlalchemy.orm import load_only
 from auth_token import *
 from uuid import uuid4
 from slugify import slugify

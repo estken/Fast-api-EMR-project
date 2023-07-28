@@ -4,27 +4,23 @@ sys.path.append("..")
 from db import client_model as models
 from schema import ClientUserSchema, UpdateClientUserSchema
 import uuid
-from .seeder import seed_client, seed_client_users
+from .seeder import seed_client, seed_client_users, seed_client_center
 
 def test_create_user(get_session):
     # seed the client.
     seed_client(get_session)
+    seed_client_center(get_session)
     # create the data.
     user_data = {
         "username": "abc@gmail.com",
         "password": "admin@123",
+        "client_id": 1
     }
     # first check if the model is empty.
     retrieve_users = models.ClientUsers.retrieve_all_users(get_session)
     assert len(retrieve_users.all()) == 0
-    # create the schema
-    user_schema = ClientUserSchema(**user_data)
-    # note the schema now contains admin field.
-    # reconvert it back to dictionary. and set the client_id field.
-    user_dict = user_schema.dict(exclude_unset=True)
-    user_dict['client_id'] = 1
     # add the data.
-    new_user = models.ClientUsers.create_client_users(user_dict)
+    new_user = models.ClientUsers.create_client_users(user_data)
     get_session.add(new_user)
     get_session.commit()
     # check if it was added.

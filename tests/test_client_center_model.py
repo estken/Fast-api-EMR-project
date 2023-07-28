@@ -17,7 +17,6 @@ def test_create_client_center(get_session):
     seed_client(get_session)
     # set up the client center data
     center_data = {
-        'client_id': 1,
         'center': 'Center 1',
         'slug': 'center-1'
     }
@@ -37,7 +36,7 @@ def test_view_client_centers(get_session):
     seed_client(get_session)
     seed_client_center(get_session)
     # view all client centers.
-    retrieve_center = models.ClientCenter.get_all_client_center(get_session, 1)
+    retrieve_center = models.ClientCenter.get_all_center(get_session)
     assert len(retrieve_center) == 3
     
 def test_update_client_center(get_session):
