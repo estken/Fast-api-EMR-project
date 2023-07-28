@@ -1,8 +1,8 @@
 # main code.
 # The main point of call.
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from schema import *
-from db.session import Base, engine, Session
+from db.session import engine, Session
 from sqlalchemy.orm import Session as session_local
 from db import client_model as models
 from db.session import get_db
@@ -13,7 +13,7 @@ from apis.user_center import user_center_router
 from apis.equipment import equipment_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn, asyncio
-import os, uuid, multiprocessing
+import os
 from tests.seeder import (
     seed_client_prod,
     seed_client_user_prod

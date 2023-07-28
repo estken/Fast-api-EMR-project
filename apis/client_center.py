@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, Request, HTTPException, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-import sys, asyncio
+import sys
 sys.path.append("..")
 from db.session import get_db
 from schema import (
@@ -8,12 +8,7 @@ from schema import (
     ClientCenterSlugSchema
 )
 from crud import center_crud
-from db import client_model as models
-from auth import validate_client_key
 from auth import validate_active_client
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 center_router = APIRouter(
     prefix="/center",
@@ -30,7 +25,7 @@ async def create_center(client_center: ClientCenterSchema, db: Session = Depends
 async def view_center(db:Session = Depends(get_db), 
                       current_user: dict = Depends(validate_active_client)):
     
-    return center_crud.get_centers(db, current_user)
+    return center_crud.get_centers(db)
 
 @center_router.patch("/disable", summary="Disable a Client Center", status_code=200)
 async def disable_center(center_slug: ClientCenterSlugSchema, db: Session = Depends(get_db),
@@ -54,4 +49,4 @@ async def edit_center(center_slug: str, update_center_data: ClientCenterSchema, 
 async def get_center(center_slug: str, db: Session = Depends(get_db),
                      current_user: dict = Depends(validate_active_client)):
     
-    return center_crud.get_center(db, current_user, center_slug)
+    return center_crud.get_center(db, center_slug)

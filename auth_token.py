@@ -3,11 +3,10 @@ from datetime import datetime, timedelta
 from jose import jwt
 from db.user_model import ClientUsers
 import os
-from response_handler import error_response
 
 ACCESS_SECRET_KEY = os.getenv('ACCESS_SECRET_KEY')
 REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')
-ACCESS_TOKEN_EXPIRE_MINUTES = 10
+ACCESS_TOKEN_EXPIRE_MINUTES = 1000
 REFRESH_TOKEN_EXPIRE_MINUTES = 30
 
 def create_token(users: ClientUsers, center_id = 0, selected_client_id=0):

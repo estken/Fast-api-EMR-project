@@ -1,28 +1,13 @@
 import sys
-from fastapi import HTTPException
 # from sqlalchemy.orm import Session, load_only
 sys.path.append("..")
 from utils import *
 from auth_token import *
-from typing import List
 from db import client_model as models
-from db.session import Session
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-from fastapi_pagination import Page, Params
 from response_handler import error_response as exceptions
 from response_handler import success_response
-from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy.orm import load_only, joinedload, selectinload
-from sqlalchemy import and_
-from datetime import datetime
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-from utils import (
-    check_password,
-    remove_fields,
-    model_to_dict
-)
+from sqlalchemy.orm import load_only, joinedload
+
 from crud import user_crud
 
 def check_uuid(db, client_id, user_uuid):
@@ -42,7 +27,7 @@ def check_user_center(db, center_details, user_payload):
     # check if username or uuid exists and return the id.
     bool_result, data = check_uuid(db, selected_client_id, username)
     if not bool_result:
-        return False, "User with such username doesn't exist", ""
+        return False, ["User with such username doesn't exist", ""], ""
     # check if the center(s) exists.
     bool_result, err_mess, center_ids = user_crud.check_centers(
         db, center_details.center, selected_client_id)
@@ -123,7 +108,7 @@ def check_existing_center(db, existing_centers):
             db).filter(models.ClientCenter.id.in_(center_list))
         # get the existing slugs
         slug_list = [center.slug for center in existing_slugs]
-        message = "The following centers already exists for user: " + ", ".join(slug_list)
+        message = ["Centers already exists for user:", slug_list]
         
         return False, message
     
@@ -136,7 +121,7 @@ def add_new_center(db, center_details, user_payload):
             db, center_details, user_payload)
         
         if not bool_result:
-            return exceptions.bad_request_error(data)
+            return exceptions.bad_request_error(data[0], data[1])
         
         existing_centers = models.UserCenter.user_center_object(
             db).filter(models.UserCenter.user_id == data.id,
@@ -144,7 +129,7 @@ def add_new_center(db, center_details, user_payload):
     
         bool_result, message = check_existing_center(db, existing_centers)
         if not bool_result:
-            return exceptions.bad_request_error(message)
+            return exceptions.bad_request_error(message[0], message[1])
     
         
         create_center = models.UserCenter.bulk_create(center_ids, data.id, -1)
@@ -167,7 +152,7 @@ def remove_center(db, center_details, user_payload):
             db, center_details, user_payload)
         
         if not bool_result:
-            return exceptions.bad_request_error(data)
+            return exceptions.bad_request_error(data[0], data[1])
         
         existing_centers = models.UserCenter.user_center_object(
             db).filter(models.UserCenter.user_id == data.id,
@@ -183,7 +168,7 @@ def remove_center(db, center_details, user_payload):
         if len(user_centers) == len(existing_centers):
             return exceptions.bad_request_error("User must have atleast 1 center")
         # remove the center ids immediately.
-        removed_centers = models.UserCenter.user_center_object(
+        models.UserCenter.user_center_object(
             db).filter(models.UserCenter.user_id == data.id,
                        models.UserCenter.center_id.in_(center_ids)).delete()
         db.commit()
@@ -197,7 +182,7 @@ def remove_center(db, center_details, user_payload):
 def set_default_center(db, user_center, user_payload):
     try:
         selected_client_id = user_payload.get("selected_client_id")
-            # check if the uuid exists.
+        # check if the uuid exists.
         username = user_center.username
         # check if username or uuid exists and return the id.
         bool_result, data = check_uuid(db, selected_client_id, username)
@@ -207,7 +192,6 @@ def set_default_center(db, user_center, user_payload):
         check_slug = models.ClientCenter.check_slug(db, user_center.center)
         if check_slug is None:
             return exceptions.bad_request_error(f"No Center with such slug {user_center.center}")
-        
         # check if center is present for the user
         check_user = models.UserCenter.user_center_object(
             db).filter_by(user_id = data.id, center_id = check_slug.id).first()
@@ -217,9 +201,8 @@ def set_default_center(db, user_center, user_payload):
         
         if check_user.is_default:
             return exceptions.bad_request_error("The center has already been set as default")
-        
         # unset all centers a False.
-        disable_all = models.UserCenter.user_center_object(
+        models.UserCenter.user_center_object(
             db).filter_by(user_id=data.id).update({"is_default":False})
         # set new default center.
         check_user.is_default = True

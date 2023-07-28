@@ -1,10 +1,8 @@
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import sys
-from sqlalchemy.orm import sessionmaker
 sys.path.append("..")
-from db.session import engine, Base, get_db
+from db.session import engine, Base
 from db.session import Session as sess
 from main import access_control_app 
 # the scope = 'session' is called once when the test is runned accross all files.

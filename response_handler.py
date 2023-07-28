@@ -8,10 +8,11 @@ class Exceptions:
     def __init__(self):
         pass
     
-    def bad_request_error(self, detail="An error occurred"):
+    def bad_request_error(self, detail="An error occurred", data = []):
         return JSONResponse(
             status_code= 400,
             content=jsonable_encoder({"detail": detail,
+                                      "data": data,
                                       "status": 0}),
         )
         

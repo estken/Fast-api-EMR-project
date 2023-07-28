@@ -1,21 +1,12 @@
 import sys
-from fastapi import HTTPException
 # from sqlalchemy.orm import Session, load_only
 sys.path.append("..")
 from utils import *
 from auth_token import *
-from typing import List
 from db import client_model as models
 from db.session import Session
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-from fastapi_pagination import Page, Params
 from response_handler import error_response as exceptions
 from response_handler import success_response
-from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy.orm import load_only, joinedload, selectinload
-from sqlalchemy import and_
-from datetime import datetime
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from utils import (
@@ -30,7 +21,6 @@ hasher = PasswordHasher()
 
 def check_centers(db, center_list, client_id):
     error_message = ""
-    centers_ids = []
     check_all = True
     center_list = [center_name.lower() for center_name in center_list]
     
@@ -38,12 +28,18 @@ def check_centers(db, center_list, client_id):
         db).filter(models.ClientCenter.slug.in_(center_list)).all()
     
     # Create a dictionary to store center names as keys and IDs as values
-    center_name = {center.slug: center.id for center in existing_centers}
+    center_name = {center.slug: center.id for center in existing_centers if center.status}
+    # check if there are any inactive centers based on the slugs supplied.
+    inactive_centers = [center.slug for center in existing_centers if not center.status]
+    
+    if len(inactive_centers) > 0:
+        return False, ["Error: Inactive Centers", inactive_centers], ""
+        
     # get the missing centers, that's the supplied centers that are not valid.
     missing_centers = set(center_list) - set(center_name.keys())
     if len(missing_centers) != 0:
         check_all = False
-        error_message = "The following centers don't exist: " + ", ".join(list(missing_centers))
+        error_message = ["Error: Centers don't exist:", list(missing_centers)]
     
     return check_all, error_message, list(center_name.values())
 
@@ -123,7 +119,7 @@ def create_user(db, user_payload, new_user):
         # check if the center(s) exists.
         bool_result, err_mess, center_ids = check_centers(db, new_user.center, selected_client_id)
         if not bool_result:
-            return exceptions.bad_request_error(err_mess)
+            return exceptions.bad_request_error(err_mess[0], err_mess[1])
                 
         # create the user
         new_user_dict = new_user.dict(exclude_unset = True)

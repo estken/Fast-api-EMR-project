@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, Request, HTTPException, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-import sys, asyncio
+import sys
 sys.path.append("..")
 from db.session import get_db
 from schema import (
@@ -8,13 +8,8 @@ from schema import (
     UserCenterSchema,
     UserDefaultSchema
 )
-from crud import center_crud, user_center_crud
-from db import client_model as models
-from auth import validate_client_key
+from crud import user_center_crud
 from auth import validate_active_client
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 user_center_router = APIRouter(
     prefix="/user/center",

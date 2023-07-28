@@ -1,23 +1,11 @@
 import sys
-
-from fastapi import HTTPException
-# from sqlalchemy.orm import Session, load_only
-
 sys.path.append("..")
 from utils import *
-from typing import List
 from db import client_model as models
 from db.session import Session
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-from fastapi_pagination import Page, Params
+
 from response_handler import error_response as exceptions
 from response_handler import success_response
-from fastapi_pagination.ext.sqlalchemy import paginate
-
-from sqlalchemy.orm import load_only, joinedload, selectinload
-from sqlalchemy import and_
-from datetime import datetime
 from slugify import slugify
 
 db = Session()
@@ -106,7 +94,7 @@ def update_center_status(db, user_payload, center_slug, state):
     except Exception as e:
         return exceptions.server_error(detail=str(e))
 
-def get_center(db, user_payload, center_slug):
+def get_center(db, center_slug):
     try:
         # check if slug exists.
         check_center = models.ClientCenter.check_slug(db, center_slug)
@@ -118,10 +106,9 @@ def get_center(db, user_payload, center_slug):
     except Exception as e:
         return exceptions.server_error(detail=str(e))
         
-def get_centers(db, user_payload):
+def get_centers(db):
     try:
         # get the user payload for the centers.
-        selected_client_id = user_payload.get("selected_client_id")
         centers = models.ClientCenter.get_all_center(db)
         
         return success_response.success_message(centers)
