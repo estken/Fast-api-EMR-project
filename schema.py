@@ -9,11 +9,11 @@ class BaseModel(PydanticBaseModel):
         orm_mode = True
 
 class ClientSchema(BaseModel):
-    slug: str
-    client_key: str   
+    client_name: str 
     
 class UpdateStatusSchema(BaseModel):
-    status: bool
+    client_name: str = None
+    status: bool = None
     
     @validator('status')
     def validate_status(cls, v):
@@ -32,10 +32,63 @@ class UpdateUserGroupSchema(BaseModel):
     group_name: str = None
     slug: str = None
     status: bool = None
+class ClientCenterSchema(BaseModel):
+    center: str
+    
+class UpdateClientCenterSchema(BaseModel):
+    center: str = None
+    status: bool = None
+class ClientUserSchema(BaseModel):
+    username: str
+    password: str = Field(min_length=8)
+    admin: bool = False
+    center: List[str]
+    
+    @validator('admin')
+    def validate_admin(cls, v):
+        if v not in (True, False):
+            raise ValueError("Value must be True or False")
+        return v
+
+class UpdateClientUserSchema(BaseModel):
+    username: str = None
+    group_slug: str = None
+    admin: bool = None
+    status: bool = None
+       
+    @validator('admin')
+    def validate_admin(cls, v):
+        if v not in (True, False):
+            raise ValueError("Value must be True or False")
+        return v
     
     @validator('status')
     def validate_status(cls, v):
         if v not in (True, False):
             raise ValueError("Value must be True or False")
         return v
+        
+class refreshTokenSchema(BaseModel):
+    refresh_token: str
+    
+class UpdateClientPasswordSchema(BaseModel):
+    password: str
+    
+class ClientCenterSchema(BaseModel):
+    center: str
+    
+class ClientCenterSlugSchema(BaseModel):
+    slug: str
+
+class UserSchema(BaseModel):
+    username: str # to be replaced wuth UUID.
+    
+class UserCenterSchema(BaseModel):
+    username: str # to be replaced with UUID.
+    center: List[str]
+    
+class UserDefaultSchema(BaseModel):
+    username: str # to be replaced with UUID.
+    center: str
+
     

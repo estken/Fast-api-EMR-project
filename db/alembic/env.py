@@ -6,10 +6,18 @@ import sys
 import os
 from alembic import context
 sys.path.append("..")
-from db import models
+from db.session import Base
+
+from db import (
+    client_model,
+    user_model,
+    center_model,
+    user_center_model,
+    room_model, equipment_model,
+    user_group_model
+)
+
 from db.connection import get_db_conn_string
-
-
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,7 +31,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-target_metadata = models.Base.metadata
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

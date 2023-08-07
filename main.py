@@ -1,18 +1,21 @@
 # main code.
 # The main point of call.
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from schema import *
-from db.session import Base, engine, Session
-from sqlalchemy.orm import Session as session_local
-from db import models
-from db.session import get_db
+from db.session import engine, Session
+from db import client_model as models
 from apis.client import client_router
 from apis.user_group import user_group_router
+from apis.client_user import user_router
+from apis.client_center import center_router
+from apis.user_center import user_center_router
+from apis.equipment import equipment_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn, asyncio
-import os, uuid, multiprocessing
+import os
 from tests.seeder import (
-    seed_client_prod
+    seed_client_prod,
+    seed_client_user_prod
 )
 
 # Microservice description
@@ -65,13 +68,31 @@ access_control_app.include_router(
 )
 # include the user router.
 access_control_app.include_router(
+    user_router
+)
+# include the center router.
+access_control_app.include_router(
+    center_router
+)
+# include the user_group router
+access_control_app.include_router(
     user_group_router
 )
+# include the user center router.
+access_control_app.include_router(
+    user_center_router
+)
 
+# include the equipment router.
+access_control_app.include_router(
+    equipment_router
+)
 @access_control_app.on_event("startup")
 async def startup_event():
     db = Session()
-    seed_client_prod(db)
+    if not os.environ['TESTING']:
+        seed_client_prod(db)
+        seed_client_user_prod(db)
     db.close()
     
     
