@@ -10,8 +10,8 @@ sys.path.append("..")
 class UserGroup(Base):
     __tablename__ = 'user_group'
     id = Column(Integer, primary_key=True, index=True)
-    group_name = Column(String(100), nullable=False)
-    slug = Column(String(100), nullable=False)
+    group_name = Column(String(100), nullable=False, unique=True)
+    slug = Column(String(100), nullable=False, unique=True)
     status = Column(Boolean, nullable=False, default=True)
     
     created_at = Column(TIMESTAMP(timezone=True),
@@ -32,6 +32,11 @@ class UserGroup(Base):
     @staticmethod
     def create_user_group(user_group: dict):
         return UserGroup(**user_group)
+    
+    @staticmethod
+    def check_slug(db, slug):
+        return UserGroup.user_group_object(db).filter_by(
+            slug=slug).first()
     
     @staticmethod
     def get_user_groups(db: Session):
