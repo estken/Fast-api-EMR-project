@@ -50,19 +50,22 @@ def update_permit(db, router_name, update_permit_data):
         # if the router doesn't exists.
         if bool_result:
             return exceptions.bad_request_error(f"Permission with name {router_name}")
+       
+        # check if the status is also being updated.
+        get_status = update_permit_data.get('status', None)
+        print(get_status)
+        if get_status is not None:
+            # check if the status already has that state.
+            if get_status == data.status:
+                if get_status is True:
+                    return exceptions.bad_request_error("Permission is already active")
+                return exceptions.bad_request_error("Permission is already disabled")
+
         
         update_client_permission = models.Permissions.update_permission(
             db, data.id, update_permit_data)
         
-        # check if the status is also being updated.
-        get_status = update_permit_data.get('status', None)
-        if get_status is not None:
-            # check if the status already has that state.
-            if get_status == data.status:
-                if get_status:
-                    return exceptions.bad_request_error("Permission is already active")
-                return exceptions.bad_request_error("Permission is already disabled")
-                    
+                           
         if not update_client_permission:
             return exceptions.bad_request_error("An error ocurred while updating Permission, Please try again")
         db.add(update_client_permission)

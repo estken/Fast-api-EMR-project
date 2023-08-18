@@ -40,14 +40,14 @@ async def enabled_permission(page: int=Query(1, ge=1),
                          page_size:int =10, 
                          current_user: dict = Depends(validate_active_client),db: Session = Depends(get_db)):
     
-    return permit_crud.get_permission(db, page, page_size, True)
+    return permit_crud.get_permissions(db, page, page_size, True)
 
 @permission_router.get('/', summary="Get all Permissions", status_code=200)
 async def all_permission(page: int=Query(1, ge=1), 
                          page_size:int =10, current_user: dict = Depends(validate_active_client), 
                          db: Session = Depends(get_db)):
     
-    return permit_crud.get_permission(db, page, page_size)
+    return permit_crud.get_permissions(db, page, page_size)
 
 @permission_router.patch('/update/{router_name}', summary="Update Permission", status_code=200)
 async def all_permission(router_name: str, update_permit_data: UpdatePermissionSchema, current_user: dict = Depends(validate_active_client), 
