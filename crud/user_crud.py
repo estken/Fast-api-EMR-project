@@ -225,3 +225,4 @@ def update_details(db, username, user_payload, update_data):
     
     except Exception as e:
         return exceptions.server_error(detail=str(e))
+    

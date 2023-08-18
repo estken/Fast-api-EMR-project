@@ -91,4 +91,10 @@ class UserDefaultSchema(BaseModel):
     username: str # to be replaced with UUID.
     center: str
 
+class PermissionSchema(BaseModel):
+    router_name: str
+    description: str
     
+class UpdatePermissionSchema(BaseModel):
+    router_name: str = None
+    description: str = None

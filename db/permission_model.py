@@ -31,6 +31,10 @@ class Permissions(Base):
         return Permissions.permission_object(db).get(permit_id)
     
     @staticmethod
+    def create_permission(permit_data: dict):
+        return Permissions(**permit_data)
+    
+    @staticmethod
     def get_all_permission(db):
         return Permissions.permission_object(db).all()
     
@@ -40,7 +44,7 @@ class Permissions(Base):
             router_name=router_name).first()
         
     @staticmethod
-    def update_user_center(db, permit_id: int, permit_data: dict):
+    def update_permission(db, permit_id: int, permit_data: dict):
         permit = Permissions.get_permission_by_id(db, permit_id)
         for key, value in permit_data.items():
             setattr(permit, key, value) 

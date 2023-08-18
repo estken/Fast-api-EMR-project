@@ -14,7 +14,7 @@ from db import (
     center_model,
     user_center_model,
     room_model, equipment_model,
-    user_group_model
+    user_group_model, permission_model
 )
 
 from db.connection import get_db_conn_string
