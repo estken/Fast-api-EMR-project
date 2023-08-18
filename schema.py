@@ -96,5 +96,4 @@ class PermissionSchema(BaseModel):
     description: str
     
 class UpdatePermissionSchema(BaseModel):
-    router_name: str = None
     description: str = None
