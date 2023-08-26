@@ -26,12 +26,11 @@ class UpdateClientKeySchema(BaseModel):
     
 class UserGroupSchema(BaseModel):
     group_name: str
-    slug: str
     
 class UpdateUserGroupSchema(BaseModel):
     group_name: str = None
-    slug: str = None
     status: bool = None
+    
 class ClientCenterSchema(BaseModel):
     center: str
     

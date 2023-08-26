@@ -17,7 +17,6 @@ logging.basicConfig(level=logging.DEBUG)
 def test_create_user_group(client_instance, admin_login):
     # Create a user group with the given name and slug
     user_group_data = {
-        'slug': 'slug1',
         'group_name': 'group_name1'
     }
     # header.
@@ -36,7 +35,6 @@ def test_create_user_group_exist_error(client_instance, get_session, admin_login
     seed_user_group(get_session)
     # Create a user group with the given name and slug
     user_group_data = {
-        'slug': 'slug',
         'group_name': 'admin'
     }
     # header.
@@ -47,7 +45,7 @@ def test_create_user_group_exist_error(client_instance, get_session, admin_login
     # create the group
     group_response = client_instance.post('/user/group/create', json=user_group_data, headers=headers)
     assert group_response.status_code == 400
-    assert group_response.json()['detail'] == f"Sorry, User Group with slug name {user_group_data['slug']} exists for this client"
+    assert group_response.json()['detail'] == f"Sorry, User Group with group name {user_group_data['group_name']} exists for this client"
     assert group_response.json()['status'] == 0
     
     
@@ -63,7 +61,7 @@ def test_disable_group(client_instance, get_session, admin_login):
     get_group = models.UserGroup.get_user_group_by_id(get_session, 1)
     assert get_group.status == True
     # deactivate.
-    group_response = client_instance.patch('/user/group/disable/1', headers=headers)
+    group_response = client_instance.patch('/user/group/disable/slug', headers=headers)
     get_session.commit()
     assert group_response.status_code == 200
      # check the status of the user group.
@@ -123,5 +121,5 @@ def test_view_single_groups(client_instance, get_session, admin_login):
         "Authorization":f"Bearer {admin_login['access_token']}"
     }
     # with default length 10
-    group_response = client_instance.get('/user/group/single/1', headers=headers)
+    group_response = client_instance.get('/user/group/single/slug', headers=headers)
     assert group_response.status_code == 200    
