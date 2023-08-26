@@ -53,7 +53,6 @@ def update_permit(db, router_name, update_permit_data):
        
         # check if the status is also being updated.
         get_status = update_permit_data.get('status', None)
-        print(get_status)
         if get_status is not None:
             # check if the status already has that state.
             if get_status == data.status:
@@ -87,8 +86,7 @@ def get_permissions(db, page: int, page_size: int, permit_state = None):
         )
         if permit_state is not None:
             data_result = data_result.filter_by(status=permit_state)
-        
-         # calculate page offset.
+        # calculate page offset.
         page_offset = Params(page=page, size=page_size)
 
         all_permission = paginate(data_result, page_offset)

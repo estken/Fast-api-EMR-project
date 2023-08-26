@@ -29,6 +29,7 @@ class UserGroup(Base):
     @staticmethod
     def get_user_group_by_id(db: Session, id: int):
         return UserGroup.user_group_object(db).get(id)
+    
     @staticmethod
     def create_user_group(user_group: dict):
         return UserGroup(**user_group)
@@ -40,8 +41,8 @@ class UserGroup(Base):
     
     @staticmethod
     def get_user_groups(db: Session):
-        return UserGroup.user_group_object(db).distinct(UserGroup.group_name, UserGroup.slug)
-        
+        return UserGroup.user_group_object(db)
+    
     @staticmethod
     def update_user_group(db: Session, user_group_id: int, user_group_data: dict):
         user_group = UserGroup.get_user_group_by_id(db, user_group_id)

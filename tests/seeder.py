@@ -118,10 +118,10 @@ def seed_client_user_prod(db: Session):
 def seed_permission(db: Session):
     from db.client_model import Permissions
     permission_data = [
-        {'router_name': 'router1', 'description': 'desc1'},
-        {'router_name': 'router2', 'description': 'desc2'},
-        {'router_name': 'router3', 'description': 'desc3'},
-        {'router_name': 'router4', 'description': 'desc4', 'status': False}
+        {'router_name': 'router1', 'description': 'desc1', 'label': 'router 1'},
+        {'router_name': 'router2', 'description': 'desc2', 'label': 'router 2'},
+        {'router_name': 'router3', 'description': 'desc3', 'label': 'router 3'},
+        {'router_name': 'router4', 'description': 'desc4', 'status': False, 'label': 'router 4'}
     ]
     
     if Permissions.permission_object(db).count() == 0:

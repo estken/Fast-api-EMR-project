@@ -92,7 +92,9 @@ class UserDefaultSchema(BaseModel):
 
 class PermissionSchema(BaseModel):
     router_name: str
+    label: str
     description: str
     
 class UpdatePermissionSchema(BaseModel):
     description: str = None
+    label: str = None
