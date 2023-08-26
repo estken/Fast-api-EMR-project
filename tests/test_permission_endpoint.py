@@ -121,9 +121,11 @@ def test_get_all_permission(get_session, client_instance, admin_login):
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"
     }
+    # get all the permission.
+    all_permissions = get_session.query(Permissions).all()
     
     permit_response = client_instance.get('/permission/', headers=headers)
-    assert len(permit_response.json()['data']['items']) == 4
+    assert len(permit_response.json()['data']['items']) == len(all_permissions)
     assert permit_response.status_code == 200
     assert permit_response.json()['data']['page'] == 1
     
@@ -133,8 +135,9 @@ def test_get_active_permission(get_session, client_instance, admin_login):
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"
     }
-    
+    # get all active permissions.
+    all_active_permissions = get_session.query(Permissions).filter(Permissions.status==True).all()
     permit_response = client_instance.get('/permission/enabled', headers=headers)
-    assert len(permit_response.json()['data']['items']) == 3
+    assert len(permit_response.json()['data']['items']) == len(all_active_permissions)
     assert permit_response.status_code == 200
     assert permit_response.json()['data']['page'] == 1
