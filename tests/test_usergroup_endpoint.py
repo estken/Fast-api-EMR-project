@@ -42,7 +42,6 @@ def test_create_user_group_exist_error(client_instance, get_session, admin_login
         'group_name': 'admin'
     }
     # header.
-    # header.
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"
     }
@@ -58,7 +57,7 @@ def test_disable_group(client_instance, get_session, admin_login):
     user_group_data = {
         'group_name': 'group_name1',
         'slug': 'slug'
-    }    # header.
+    } 
     new_group = UserGroup(**user_group_data)
     get_session.add(new_group)
     get_session.commit()
