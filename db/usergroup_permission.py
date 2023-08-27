@@ -21,7 +21,7 @@ class UserGroupPermission(Base):
                         default=datetime.utcnow(), 
                         onupdate=datetime.utcnow(), nullable=False)
     # define the relationships.
-    permissions = relationship("Permission", back_populates="user_permission")
+    permissions = relationship("Permissions", back_populates="user_permission")
     user_group = relationship("UserGroup", back_populates="user_permission")
     # define the static methods.
     @staticmethod
@@ -48,4 +48,5 @@ class UserGroupPermission(Base):
             setattr(user_permit, key, value)
         return user_permit
         
+    
     

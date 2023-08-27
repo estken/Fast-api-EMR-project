@@ -101,3 +101,7 @@ class UpdatePermissionSchema(BaseModel):
 class UserPermissionSchema(BaseModel):
     router_name: str
     group_name: str
+    
+class UserPermissionRemoveSchema(BaseModel):
+    group_name: str
+    router_name: List[str]
