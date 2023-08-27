@@ -9,6 +9,8 @@ from .center_model import ClientCenter
 from .equipment_model import ClientEquipment
 from .user_center_model import UserCenter
 from .room_model import ClientRoom
+from .user_group_model import UserGroup
+from .permission_model import Permissions
 import sys
 sys.path.append("..")
 
@@ -64,3 +66,4 @@ class Client(Base):
         for key, value in client_data.items():
             setattr(client, key, value)
         return client
+           

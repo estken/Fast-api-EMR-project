@@ -24,6 +24,13 @@ class UpdateStatusSchema(BaseModel):
 class UpdateClientKeySchema(BaseModel):
     client_key: str
     
+class UserGroupSchema(BaseModel):
+    group_name: str
+    
+class UpdateUserGroupSchema(BaseModel):
+    group_name: str = None
+    status: bool = None
+    
 class ClientCenterSchema(BaseModel):
     center: str
     
@@ -83,4 +90,11 @@ class UserDefaultSchema(BaseModel):
     username: str # to be replaced with UUID.
     center: str
 
+class PermissionSchema(BaseModel):
+    router_name: str
+    label: str
+    description: str
     
+class UpdatePermissionSchema(BaseModel):
+    description: str = None
+    label: str = None

@@ -38,6 +38,34 @@ def seed_client_prod(db: Session):
         client_instances = [Client(**client) for client in client_data]
         db.add_all(client_instances)
         db.commit()
+
+def seed_user_group(db: Session):
+    from db.client_model import UserGroup
+    user_group_data = [
+        {'slug': 'slug', 'group_name': 'admin'},
+        {'slug': 'slug2', 'group_name': 'doctor', 'status': False},
+        {'slug': 'slug3', 'group_name': 'pharmacy'},
+        {'slug': 'slug4', 'group_name': 'nurse'},
+        {'slug': 'slug5', 'group_name': 'admin1'},
+        {'slug': 'slug6', 'group_name': 'doctor1', 'status': False},
+        {'slug': 'slug7', 'group_name': 'pharmacy1'},
+        {'slug': 'slug8', 'group_name': 'nurse1'},
+        {'slug': 'slug9', 'group_name': 'admin2'},
+        {'slug': 'slug10', 'group_name': 'doctor2', 'status': False},
+        {'slug': 'slug11', 'group_name': 'pharmacy2'},
+        {'slug': 'slug12', 'group_name': 'nurse3'},
+        {'slug': 'slug13', 'group_name': 'pharmacy3'},
+        {'slug': 'slug14', 'group_name': 'nurse4'}, 
+        {'slug': 'slug15', 'group_name': 'pharmacy4'},
+        {'slug': 'slug16', 'group_name': 'nurse5'},
+        {'slug': 'slug17', 'group_name': 'pharmacy5'},
+        {'slug': 'slug18', 'group_name': 'nurse6'}
+    ]
+    
+    if UserGroup.user_group_object(db).count() == 0:
+        group_instance = [UserGroup(**user_group) for user_group in user_group_data]
+        db.add_all(group_instance)
+        db.commit()
         
 def seed_client_center(db: Session):
     from db.client_model import ClientCenter
@@ -85,4 +113,18 @@ def seed_client_user_prod(db: Session):
             user_instance.append(ClientUsers(**user))
               
         db.add_all(user_instance)
+        db.commit()
+        
+def seed_permission(db: Session):
+    from db.client_model import Permissions
+    permission_data = [
+        {'router_name': 'router1', 'description': 'desc1', 'label': 'router 1'},
+        {'router_name': 'router2', 'description': 'desc2', 'label': 'router 2'},
+        {'router_name': 'router3', 'description': 'desc3', 'label': 'router 3'},
+        {'router_name': 'router4', 'description': 'desc4', 'status': False, 'label': 'router 4'}
+    ]
+    
+    if Permissions.permission_object(db).count() == 0:
+        permit_instance = [Permissions(**permit) for permit in permission_data]
+        db.add_all(permit_instance)
         db.commit()
