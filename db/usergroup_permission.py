@@ -1,12 +1,9 @@
 from .session import Base
-from sqlalchemy import Column, Enum, Integer, String, Boolean, TIMESTAMP, ForeignKey, Float, JSON, TEXT
-from sqlalchemy.orm import Session, load_only, relationship
-import uuid
+from sqlalchemy import Column, Integer, TIMESTAMP, ForeignKey
+from sqlalchemy.orm import relationship
 from datetime import datetime
-from sqlalchemy.sql import text
 import sys
 sys.path.append("..")
-from db.session import Session as sess
 
 
 class UserGroupPermission(Base):

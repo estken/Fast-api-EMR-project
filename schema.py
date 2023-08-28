@@ -26,12 +26,11 @@ class UpdateClientKeySchema(BaseModel):
     
 class UserGroupSchema(BaseModel):
     group_name: str
-    slug: str
     
 class UpdateUserGroupSchema(BaseModel):
     group_name: str = None
-    slug: str = None
     status: bool = None
+    
 class ClientCenterSchema(BaseModel):
     center: str
     
@@ -93,6 +92,7 @@ class UserDefaultSchema(BaseModel):
 
 class PermissionSchema(BaseModel):
     router_name: str
+    label: str
     description: str
     
 class UpdatePermissionSchema(BaseModel):

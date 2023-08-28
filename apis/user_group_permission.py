@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 import sys
+from typing import List
 sys.path.append("..")
 from db.session import get_db
-from schema import UserPermissionSchema, UserPermissionRemoveSchema
+from schema import UserPermissionSchema
 from crud import user_permit_crud
-from auth import validate_client_key, validate_active_client
+from auth import validate_active_client
 
 
 user_permit_router = APIRouter(
@@ -26,8 +27,8 @@ async def get_group_permission(group_name: str, db: Session = Depends(get_db),
     return user_permit_crud.get_group_permissions(db, group_name)
 
 
-@user_permit_router.delete('/remove', summary="Remove Permissions for UserGroup", status_code=200)
-async def remove_permission(user_permit: UserPermissionRemoveSchema, db: Session = Depends(get_db),
+@user_permit_router.delete('/remove/{group_name}', summary="Remove Permissions for UserGroup", status_code=200)
+async def remove_permission(group_name: str, router_name: List[str] = Query(...), db: Session = Depends(get_db),
                              current_user: dict = Depends(validate_active_client)):
-    return user_permit_crud.remove_permission(db, user_permit)
+    return user_permit_crud.remove_permission(db, group_name, router_name)
     

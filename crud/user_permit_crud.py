@@ -3,10 +3,8 @@ sys.path.append("..")
 from utils import *
 from db import client_model as models
 from db.session import Session
-from fastapi_pagination import Params
 from response_handler import error_response as exceptions
 from response_handler import success_response
-from fastapi_pagination.ext.sqlalchemy import paginate
 
 from sqlalchemy.orm import load_only, joinedload
 
@@ -22,15 +20,15 @@ def check_user_group(db, group_name):
     
     return True, check_group
 
-def check_group_permission(db, user_permit):
+def check_group_permission(db, router_name):
     # list of permissions
-    permission_list = [router_name.lower() for router_name in user_permit.router_name]
+    permission_list = [get_router_name.lower() for get_router_name in router_name]
     # check if the permission really exists.
     valid_permit = models.Permissions.permission_object(
         db).filter(models.Permissions.router_name.in_(permission_list)).all()
     # create a dictionary to store the router and the ids.
     permit_name = {router.id: router.router_name for router in valid_permit}
-    missing_permit = set(user_permit.router_name) - set(permit_name.values())
+    missing_permit = set(router_name) - set(permit_name.values())
     
     if len(missing_permit) != 0:
         return False, ["Permission don't exist", list(missing_permit)],  ""
@@ -100,17 +98,17 @@ def get_group_permissions(db, group_name):
     except Exception as e:
         return exceptions.server_error(str(e))        
 
-def remove_permission(db, user_permit):
+def remove_permission(db, group_name, router_name):
     # for multiple and single delete or removal.
     try:
         # check the group name.
-        bool_result, group_data = check_user_group(db, user_permit.group_name)
+        bool_result, group_data = check_user_group(db, group_name)
         # check if the group is none or not.
         if not bool_result:
             return exceptions.bad_request_error(group_data)
         # check user, centers and other properties.
         bool_result, data, permit_values = check_group_permission(
-            db, user_permit)
+            db, router_name)
         
         if not bool_result:
             return exceptions.bad_request_error(data[0], data[1])
