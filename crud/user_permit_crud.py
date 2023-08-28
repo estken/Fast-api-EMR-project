@@ -10,13 +10,13 @@ from sqlalchemy.orm import load_only, joinedload
 
 db = Session()
 
-def check_user_group(db, group_name):
+def check_user_group(db, group_slug):
     
     check_group = models.UserGroup.user_group_object(
-            db).filter_by(group_name=group_name).first()
+            db).filter_by(slug=group_slug).first()
         # check if the group is none or not.
     if check_group is None:
-        return False, f"User Group with name: {group_name} does not exist"
+        return False, f"User Group with name: {group_slug} does not exist"
     
     return True, check_group
 
@@ -57,19 +57,24 @@ def create_user_permit(db, user_permit):
         # check if the router is none or not.
         if check_router is None:
             return exceptions.bad_request_error(f"Permission with router name: {user_permit.router_name} does not exists")
-        # check the group name.
-        bool_result, data = check_user_group(db, user_permit.group_name)
+        # check if the permission is disabled.
+        if not check_router.status:
+            return exceptions.bad_request_error(f"Permission with router name: {user_permit.router_name} is already disabled")
+        # check if the group name is none or not.
+        check_group = models.UserGroup.user_group_object(
+            db).filter_by(group_name=user_permit.group_name).first()
         # check if the group is none or not.
-        if not bool_result:
-            return exceptions.bad_request_error(data)
+        if check_group is None:
+            return exceptions.bad_request_error(f"User Group with name: {user_permit.group_name} does not exists")
+
         # check if such permission already exists for the UserGroup.
         check_user_permission = models.UserGroupPermission.userpermit_object(
-            db).filter_by(user_group_id=data.id, permission_id=check_router.id).first()   
+            db).filter_by(user_group_id=check_group.id, permission_id=check_router.id).first()   
         if check_user_permission is not None:
             return exceptions.bad_request_error(f"Permission already exist for UserGroup")
         # else create it immediately.
         user_permit_dict = {}
-        user_permit_dict['user_group_id'] = data.id
+        user_permit_dict['user_group_id'] = check_group.id
         user_permit_dict['permission_id'] = check_router.id
         
         new_group_permit = models.UserGroupPermission.create_usergroup_permit(user_permit_dict)
@@ -80,10 +85,10 @@ def create_user_permit(db, user_permit):
     except Exception as e:
         return exceptions.server_error(str(e))
     
-def get_group_permissions(db, group_name):
+def get_group_permissions(db, group_slug):
     try:
         # check the group name.
-        bool_result, data = check_user_group(db, group_name)
+        bool_result, data = check_user_group(db, group_slug)
         # check if the group is none or not.
         if not bool_result:
             return exceptions.bad_request_error(data)
@@ -98,11 +103,11 @@ def get_group_permissions(db, group_name):
     except Exception as e:
         return exceptions.server_error(str(e))        
 
-def remove_permission(db, group_name, router_name):
+def remove_permission(db, group_slug, router_name):
     # for multiple and single delete or removal.
     try:
         # check the group name.
-        bool_result, group_data = check_user_group(db, group_name)
+        bool_result, group_data = check_user_group(db, group_slug)
         # check if the group is none or not.
         if not bool_result:
             return exceptions.bad_request_error(group_data)

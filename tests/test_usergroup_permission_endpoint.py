@@ -71,7 +71,7 @@ def test_all_user_group_permit(get_session, client_instance, admin_login):
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"
     }
-    user_permit_response = client_instance.get('/user/group/permission/admin', headers=headers)
+    user_permit_response = client_instance.get('/user/group/permission/slug', headers=headers)
     assert len(user_permit_response.json()['data']) == len(all_user_permit)
 
 
@@ -91,7 +91,7 @@ def test_remove_user_permit(get_session, client_instance, admin_login):
         'router_name': ['router1', 'router2'],
     }
     
-    user_permit_response = client_instance.delete('/user/group/permission/remove/admin', params=user_permit_data, headers=headers)
+    user_permit_response = client_instance.delete('/user/group/permission/remove/slug', params=user_permit_data, headers=headers)
     get_session.commit()
     all_user_permit_deleted = get_session.query(UserGroupPermission).filter_by(user_group_id=1).all()
     assert len(all_user_permit_deleted) == (len(initial_user_permit) - 2)

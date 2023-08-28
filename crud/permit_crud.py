@@ -20,6 +20,15 @@ def check_permit(db, router_name):
     
     return True, "", ""
 
+def delete_user_permission(db, permit_id):
+    # get all permissions.
+    user_permissions = models.UserGroupPermission.userpermit_object(
+        db).filter_by(permission_id=permit_id)
+    # if there are records.
+    if len(user_permissions.all()) > 0:
+        user_permissions.delete()
+        db.commit()
+
 
 def create_permission(db, permit_data):
     # first check if the client is already present.
@@ -42,7 +51,7 @@ def create_permission(db, permit_data):
     except Exception as e:
         return exceptions.server_error(detail=str(e))
     
-
+        
 def update_permit(db, router_name, update_permit_data):
     try:
         # first check if the permission exists or not.
@@ -50,7 +59,6 @@ def update_permit(db, router_name, update_permit_data):
         # if the router doesn't exists.
         if bool_result:
             return exceptions.bad_request_error(f"Permission with name {router_name}")
-       
         # check if the status is also being updated.
         get_status = update_permit_data.get('status', None)
         if get_status is not None:
@@ -59,8 +67,8 @@ def update_permit(db, router_name, update_permit_data):
                 if get_status is True:
                     return exceptions.bad_request_error("Permission is already active")
                 return exceptions.bad_request_error("Permission is already disabled")
-
-        
+                
+            
         update_client_permission = models.Permissions.update_permission(
             db, data.id, update_permit_data)
         
@@ -70,6 +78,9 @@ def update_permit(db, router_name, update_permit_data):
         db.add(update_client_permission)
         db.commit()
         db.refresh(update_client_permission)
+        # remove the status from the usergroup permission once disabled.
+        if get_status is not None and get_status is False:
+            delete_user_permission(db, data.id) 
         
         return success_response.success_message(update_client_permission, "User record was successfully updated")
 
