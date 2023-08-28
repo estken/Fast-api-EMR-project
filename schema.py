@@ -101,4 +101,4 @@ class UpdatePermissionSchema(BaseModel):
     
 class UserPermissionSchema(BaseModel):
     router_name: str
-    group_name: str
+    group_slug: str

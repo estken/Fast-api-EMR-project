@@ -61,20 +61,19 @@ def create_user_permit(db, user_permit):
         if not check_router.status:
             return exceptions.bad_request_error(f"Permission with router name: {user_permit.router_name} is already disabled")
         # check if the group name is none or not.
-        check_group = models.UserGroup.user_group_object(
-            db).filter_by(group_name=user_permit.group_name).first()
+        # check the group name.
+        bool_result, group_data = check_user_group(db, user_permit.group_slug)
         # check if the group is none or not.
-        if check_group is None:
-            return exceptions.bad_request_error(f"User Group with name: {user_permit.group_name} does not exists")
-
+        if not bool_result:
+            return exceptions.bad_request_error(group_data)
         # check if such permission already exists for the UserGroup.
         check_user_permission = models.UserGroupPermission.userpermit_object(
-            db).filter_by(user_group_id=check_group.id, permission_id=check_router.id).first()   
+            db).filter_by(user_group_id=group_data.id, permission_id=check_router.id).first()   
         if check_user_permission is not None:
             return exceptions.bad_request_error(f"Permission already exist for UserGroup")
         # else create it immediately.
         user_permit_dict = {}
-        user_permit_dict['user_group_id'] = check_group.id
+        user_permit_dict['user_group_id'] = group_data.id
         user_permit_dict['permission_id'] = check_router.id
         
         new_group_permit = models.UserGroupPermission.create_usergroup_permit(user_permit_dict)
@@ -103,7 +102,7 @@ def get_group_permissions(db, group_slug):
     except Exception as e:
         return exceptions.server_error(str(e))        
 
-def remove_permission(db, group_slug, router_name):
+def remove_permission(db, group_slug, route_names):
     # for multiple and single delete or removal.
     try:
         # check the group name.
@@ -113,7 +112,7 @@ def remove_permission(db, group_slug, router_name):
             return exceptions.bad_request_error(group_data)
         # check user, centers and other properties.
         bool_result, data, permit_values = check_group_permission(
-            db, router_name)
+            db, route_names)
         
         if not bool_result:
             return exceptions.bad_request_error(data[0], data[1])

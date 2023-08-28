@@ -23,7 +23,7 @@ def test_add_user_group_permission(get_session, client_instance, admin_login):
     # data to be added. The data is already present in both the user group and permission as well.
     user_permit_data = {
         'router_name': 'router1',
-        'group_name':  'nurse'
+        'group_slug':  'slug4'
     }
      # header.
     headers = {
@@ -36,7 +36,7 @@ def test_add_user_group_permission(get_session, client_instance, admin_login):
     # check to be sure that the data is added properly.
     assert len(get_session.query(UserGroupPermission).all()) == 1
     get_permit = get_session.query(UserGroupPermission).filter(UserGroupPermission.user_group_id==4).first()
-    assert get_permit.user_group.group_name == user_permit_data['group_name']
+    assert get_permit.user_group.slug == user_permit_data['group_slug']
     assert get_permit.permissions.router_name == user_permit_data['router_name']
 
 def test_add_user_group_permission_error(get_session, client_instance, admin_login):
@@ -49,7 +49,7 @@ def test_add_user_group_permission_error(get_session, client_instance, admin_log
     # try adding wrong data.
     user_permit_data = {
         'router_name': 'router18',
-        'group_name':  'nurse'
+        'group_slug':  'slug4'
     }
     # header.
     headers = {
@@ -88,7 +88,7 @@ def test_remove_user_permit(get_session, client_instance, admin_login):
     }
     
     user_permit_data = {
-        'router_name': ['router1', 'router2'],
+        'route_names': ['router1', 'router2'],
     }
     
     user_permit_response = client_instance.delete('/user/group/permission/remove/slug', params=user_permit_data, headers=headers)

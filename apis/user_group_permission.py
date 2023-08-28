@@ -28,7 +28,7 @@ async def get_group_permission(group_slug: str, db: Session = Depends(get_db),
 
 
 @user_permit_router.delete('/remove/{group_slug}', summary="Remove Permissions for UserGroup", status_code=200)
-async def remove_permission(group_slug: str, router_name: List[str] = Query(...), db: Session = Depends(get_db),
+async def remove_permission(group_slug: str, route_names: List[str] = Query(...), db: Session = Depends(get_db),
                              current_user: dict = Depends(validate_active_client)):
-    return user_permit_crud.remove_permission(db, group_slug, router_name)
+    return user_permit_crud.remove_permission(db, group_slug, route_names)
     
