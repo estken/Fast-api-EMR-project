@@ -38,10 +38,9 @@ def check_group_permission(db, router_name):
 def check_permit_diff(db, existing_permit, required_permit):
     # existing permit relates to permissions already existing for usergroup.
     # required permit relates to permission required to be deleted.
-    existing_list = [permit.id for permit in existing_permit]
-    missing = set(required_permit.keys()) - set(existing_list)
-    
-    if len(missing) != 0:
+    if len(existing_permit) - len(required_permit.keys())!= 0:
+        existing_list = [permit.id for permit in existing_permit]
+        missing = set(required_permit.keys()) - set(existing_list)
         missing_list = list(missing)
         missing_router = [required_permit[id] for id in missing_list]
         return False, ["Error: Missing Permissions", missing_router]
@@ -94,7 +93,7 @@ def get_group_permissions(db, group_slug):
                 
         user_permissions = models.UserGroupPermission.userpermit_object(
             db).options(
-                joinedload(models.UserGroupPermission.permissions).load_only('router_name').options(load_only('router_name')),
+                joinedload(models.UserGroupPermission.permissions).load_only('router_name', 'label'),
                 load_only('id'),
             ).filter_by(user_group_id=data.id).all()
             
