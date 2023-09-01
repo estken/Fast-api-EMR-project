@@ -11,6 +11,7 @@ from apis.client_center import center_router
 from apis.user_center import user_center_router
 from apis.equipment import equipment_router
 from apis.permissions import permission_router
+from apis.user_group_permission import user_permit_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn, asyncio
 import os
@@ -83,7 +84,6 @@ access_control_app.include_router(
 access_control_app.include_router(
     user_center_router
 )
-
 # include the equipment router.
 access_control_app.include_router(
     equipment_router
@@ -91,6 +91,10 @@ access_control_app.include_router(
 # include the permission router.
 access_control_app.include_router(
     permission_router    
+)
+# include the user group permission router
+access_control_app.include_router(
+    user_permit_router
 )
 
 @access_control_app.on_event("startup")
@@ -109,6 +113,3 @@ async def ping():
 if __name__ == "__main__":
     # Run the FastAPI app
     asyncio.run(main())
-    
-    
-

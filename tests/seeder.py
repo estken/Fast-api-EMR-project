@@ -128,3 +128,16 @@ def seed_permission(db: Session):
         permit_instance = [Permissions(**permit) for permit in permission_data]
         db.add_all(permit_instance)
         db.commit()
+        
+def seed_group_permission(db: Session):
+    from db.client_model import UserGroupPermission
+    group_permit_data = [
+        {'user_group_id': 1, 'permission_id': 1},
+        {'user_group_id': 1, 'permission_id': 2},        
+        {'user_group_id': 1, 'permission_id': 3}
+    ]
+    
+    if UserGroupPermission.userpermit_object(db).count() == 0:
+        permit_instance = [UserGroupPermission(**permit) for permit in group_permit_data]
+        db.add_all(permit_instance)
+        db.commit()

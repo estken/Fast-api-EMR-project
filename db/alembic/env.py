@@ -14,7 +14,8 @@ from db import (
     center_model,
     user_center_model,
     room_model, equipment_model,
-    user_group_model, permission_model
+    user_group_model, permission_model,
+    usergroup_permission
 )
 
 from db.connection import get_db_conn_string
@@ -32,7 +33,6 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 target_metadata = Base.metadata
-
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")

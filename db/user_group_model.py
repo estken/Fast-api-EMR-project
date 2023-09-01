@@ -1,6 +1,6 @@
 from .session import Base
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, ForeignKey, Float, JSON, TEXT
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from datetime import datetime
 import sys
 sys.path.append("..")
@@ -19,7 +19,8 @@ class UserGroup(Base):
     updated_at = Column(TIMESTAMP(timezone=True),
                         default=datetime.utcnow(), 
                         onupdate=datetime.utcnow(), nullable=False)
-    
+    # define the relationship.
+    user_permission = relationship("UserGroupPermission", back_populates="user_group")
     # static methods.
     @staticmethod
     def user_group_object(db: Session):
