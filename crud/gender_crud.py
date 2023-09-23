@@ -29,7 +29,7 @@ def create_gender(db, gender_data):
     try:
         # first check if the name already exists.
         check_gender = models.GenderModel.create_gender_object(
-            db).filter_by(name=gender_data.name.lower()).first()
+            db).filter_by(name=gender_data.name).first()
         if check_gender is not None:
             return exceptions.bad_request_error(f"Gender with name {gender_data.name} already exists!")
         # get the slug
