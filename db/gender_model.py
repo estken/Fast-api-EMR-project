@@ -30,6 +30,10 @@ class GenderModel(Base):
             slug=slug).first()
         
     @staticmethod
+    def create_gender(gender: dict):
+        return GenderModel(**gender)
+        
+    @staticmethod
     def get_gender_by_id(db: Session, gender_id: int):
         return GenderModel.create_gender_object(db).get(gender_id)
     
