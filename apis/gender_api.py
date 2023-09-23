@@ -53,7 +53,7 @@ async def get_genders(current_user:dict = Depends(validate_active_client),
     
     return gender_crud.get_active_genders(db)
 
-@gender_router.get('/single/{slug}', summary="Get Single Gender Information", status_code=200)
+@gender_router.get('/{slug}', summary="Get Single Gender Information", status_code=200)
 async def get_single_gender(slug:str, current_user:dict = Depends(validate_active_client),
                       db: Session = Depends(get_db)):
     

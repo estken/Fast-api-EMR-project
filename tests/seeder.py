@@ -141,3 +141,15 @@ def seed_group_permission(db: Session):
         permit_instance = [UserGroupPermission(**permit) for permit in group_permit_data]
         db.add_all(permit_instance)
         db.commit()
+
+def seed_gender(db: Session):
+    from db.client_model import GenderModel
+    gender_data = [
+        {'slug': 'slug', 'name': 'male'},
+        {'slug': 'slug2', 'name': 'female', 'status': False}
+    ]
+    
+    if GenderModel.create_gender_object(db).count() == 0:
+        gender_instance = [GenderModel(**gender) for gender in gender_data]
+        db.add_all(gender_instance)
+        db.commit()
