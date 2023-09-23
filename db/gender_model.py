@@ -38,7 +38,7 @@ class GenderModel(Base):
         return GenderModel.create_gender_object(db).get(gender_id)
     
     @staticmethod
-    def update_single_patient(db: Session, gender_id, gender_data):
+    def update_single_gender(db: Session, gender_id, gender_data):
         gender = GenderModel.get_gender_by_id(db, gender_id)
         for key, value in gender_data.items():
             setattr(gender, key, value)
