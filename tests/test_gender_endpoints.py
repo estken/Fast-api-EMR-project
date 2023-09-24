@@ -2,7 +2,6 @@ from .conftest import get_session, client_instance, admin_login
 import sys
 sys.path.append("..")
 from db.client_model import GenderModel
-from schemas.gender_schema import GenderSchema, GenderUpdateSchema
 from .seeder import (
     seed_gender
 )
@@ -22,6 +21,9 @@ def test_create_gender(get_session, client_instance, admin_login):
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"
     }
+    # check if there is a record with that name first.
+    check_gender = get_session.query(GenderModel).filter_by(name=gender_data['name']).first()
+    assert check_gender is None
     # create the group
     group_response = client_instance.post('/gender/create', json=gender_data, headers=headers)
     assert group_response.status_code == 201
@@ -33,8 +35,14 @@ def test_create_gender(get_session, client_instance, admin_login):
     assert added_gender.slug is not None
     
 def test_create_gender_exist_error(client_instance, get_session, admin_login):
-    # seed usergroup
-    seed_gender(get_session)
+    new_gender_data = {
+        'name': 'male',
+        'slug': 'slug',
+        'status': True
+    } 
+    new_gender = GenderModel(**new_gender_data)
+    get_session.add(new_gender)
+    get_session.commit()
     # Create a user group with the given name and slug
     gender_data = {
         'name': 'male'
@@ -54,14 +62,12 @@ def test_disable_gender(client_instance, get_session, admin_login):
     # Seeding data into database before testing deactivate function
     gender_data = {
         'name': 'male',
-        'slug': 'slug'
+        'slug': 'slug',
+        'status': True
     } 
     new_gender = GenderModel(**gender_data)
     get_session.add(new_gender)
     get_session.commit()
-    
-    added_gender = get_session.query(GenderModel).filter_by(name=gender_data['name']).first()
-    assert added_gender.status is True
     
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"
@@ -85,9 +91,6 @@ def test_enable_gender(client_instance, get_session, admin_login):
     get_session.add(new_gender)
     get_session.commit()
     
-    added_gender = get_session.query(GenderModel).filter_by(name=gender_data['name']).first()
-    assert added_gender.status is False
-    
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"
     }
@@ -108,6 +111,7 @@ def test_view_all_genders(client_instance, get_session, admin_login):
     }
     # all gender.
     genders = get_session.query(GenderModel).all()
+    assert len(genders) > 0
     gender_response = client_instance.get('/gender/', headers=headers)
     assert len(gender_response.json()['data']) == len(genders)
     assert gender_response.status_code == 200
@@ -121,13 +125,22 @@ def test_view_all_enabled_genders(client_instance, get_session, admin_login):
     }
     # all active gender.
     active_genders = get_session.query(GenderModel).filter_by(status=True).all()
+    assert len(active_genders) > 0
+    
     gender_response = client_instance.get('/gender/active', headers=headers)
     assert len(gender_response.json()['data']) == len(active_genders)
     assert gender_response.status_code == 200
     
 def test_view_single_gender(client_instance, get_session, admin_login):
-    # seed the database for genders
-    seed_gender(get_session)
+    # add the data.
+    gender_data = {
+        'name': 'male',
+        'slug': 'slug',
+        'status': True
+    } 
+    new_gender = GenderModel(**gender_data)
+    get_session.add(new_gender)
+    get_session.commit()
     # header.
     headers = {
         "Authorization":f"Bearer {admin_login['access_token']}"

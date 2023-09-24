@@ -3,10 +3,8 @@ sys.path.append("..")
 from utils import *
 from db import client_model as models
 from db.session import Session
-from fastapi_pagination import Params
 from response_handler import error_response as exceptions
 from response_handler import success_response
-from fastapi_pagination.ext.sqlalchemy import paginate
 from slugify import slugify
 
 
@@ -67,6 +65,15 @@ def update_gender(db, gender_slug, update_data, check_state=False):
                     return exceptions.bad_request_error("Gender already enabled")
                 return exceptions.bad_request_error("Gender already disabled")    
         
+        # check if you are also updating the name.
+        if update_data.get('name') is not None:
+            # check if the name is already assigned to a gender.
+            gender_name = update_data.get('name')
+            check_name = models.GenderModel.create_gender_object(
+                db).filter_by(name=gender_name).first()
+            if check_name is not None:
+                return exceptions.bad_request_error(f"Gender with name {gender_name} already exists")
+
         # update right away.
         updated_gender = models.GenderModel.update_single_gender(db, get_slug.id, update_data)
         if not updated_gender:
