@@ -102,3 +102,13 @@ class UpdatePermissionSchema(BaseModel):
 class UserPermissionSchema(BaseModel):
     router_name: str
     group_slug: str
+    
+    
+class CreateDepartmentTypeSchema(BaseModel):
+    slug : str
+
+class CreateDepartmentSchema(BaseModel):
+    department_name : str
+    description :str = None
+    department_type : str
+    gender : str
