@@ -14,6 +14,7 @@ user_departments_router = APIRouter(
     tags=["User Departments"],
 )
 
+# endpoint to create department type
 @user_departments_router.post("/create/department_type", summary="create a department type", status_code=201)
 async def create_new_department_type(create: CreateDepartmentTypeSchema, db: Session = Depends(get_db)):
     return create_department_type(db,create)

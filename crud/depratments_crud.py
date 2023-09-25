@@ -25,7 +25,7 @@ def create_department_type(db:Session, create:CreateDepartmentTypeSchema):
     db.refresh(create_dpt)
     
 
-# crud to create departments
+# crud to create single user departments
 
 def create_departments(db:Session, create_dpt :CreateDepartmentSchema):
     #check if departments type exits
@@ -34,6 +34,7 @@ def create_departments(db:Session, create_dpt :CreateDepartmentSchema):
         return exceptions.bad_request_error("department type does not exits")
     department_type = check_dpt_type.slug
     
+    #check gender
     check_gender = models.gender_type_model.check_single_slug(db, slug=create_dpt.gender)
     if check_gender is None:
         return exceptions.bad_request_error("No gender found")
@@ -53,7 +54,7 @@ def create_departments(db:Session, create_dpt :CreateDepartmentSchema):
     
     
     
-# view all departments created
+# view all departments created crud
 def view_all_department(db:Session):
     try:
         get_departments = models.DepartmentModel.view_all_departments(db)
@@ -63,6 +64,6 @@ def view_all_department(db:Session):
     
     
     
-# update departments created
+# update departments crud
 def update_departments(db:Session):
     pass

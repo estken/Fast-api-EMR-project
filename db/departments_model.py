@@ -80,6 +80,7 @@ class gender_type_model(Base):
         return db.query(gender_type_model).filter_by(slug=slug).first()
     
     
+# department model
 class DepartmentModel(Base):
     __tablename__ = "departmentsmodels"
     id = Column(Integer, primary_key=True , index=True)
