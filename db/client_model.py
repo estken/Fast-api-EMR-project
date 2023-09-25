@@ -12,6 +12,7 @@ from .room_model import ClientRoom
 from .user_group_model import UserGroup
 from .permission_model import Permissions
 from .usergroup_permission import UserGroupPermission
+from .gender_model import GenderModel
 import sys
 sys.path.append("..")
 
