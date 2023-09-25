@@ -60,3 +60,9 @@ def view_all_department(db:Session):
         return success_response.success_message(get_departments)
     except Exception as e:
         return exceptions.server_error(detail=str(e))
+    
+    
+    
+# update departments created
+def update_departments(db:Session):
+    pass

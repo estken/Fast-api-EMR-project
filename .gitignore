@@ -30,6 +30,7 @@ dist/
 venv/
 access-control-env/
 .access-control-env
+*.access-control-env
 # Unit test reports
 TEST*.xml
 
