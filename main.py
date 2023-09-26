@@ -12,6 +12,7 @@ from apis.user_center import user_center_router
 from apis.equipment import equipment_router
 from apis.permissions import permission_router
 from apis.user_group_permission import user_permit_router
+from apis.departments_type_api import user_departments_type_router
 from apis.gender_api import gender_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn, asyncio
@@ -101,6 +102,11 @@ access_control_app.include_router(
 access_control_app.include_router(
     gender_router
 )
+# include the department type api
+access_control_app.include_router(
+    user_departments_type_router
+)
+
 @access_control_app.on_event("startup")
 async def startup_event():
     db = Session()
